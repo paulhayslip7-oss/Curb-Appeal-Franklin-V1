@@ -58,7 +58,15 @@ The repo is ready for Netlify: pages are served from `public/`, the API runs as 
    - `SESSION_SECRET` — any long random string
 3. Deploy.
 
-The Netlify storage adapter (`netlifyStore` in `src/store.js`) has not yet been exercised on a live Netlify site — test sign-up, a visit report and a photo upload on the first deploy before sharing the link.
+Live site: https://curb-appeal-franklin-v1.netlify.app
+
+The first deploy was pushed straight from the command line, so the Netlify site is not yet connected to this repository. To have every change deploy automatically, open the site in Netlify → **Project configuration → Build & deploy → Link repository**. Until then, redeploy by hand:
+
+```bash
+npx netlify-cli deploy --prod --no-build --dir public --functions netlify/functions
+```
+
+After changing an environment variable, redeploy for it to take effect.
 
 It also runs on any Node host with a persistent disk (`npm start`, set `DATA_DIR`).
 
