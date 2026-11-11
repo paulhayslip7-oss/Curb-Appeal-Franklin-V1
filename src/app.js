@@ -132,7 +132,11 @@ export function createApp(store, env = {}) {
 
   const routes = [
     // ---------- public ----------
-    ['GET', '/api/config', async () => json({ pricing: await getPricing() })],
+    // Pricing for the estimator. The owner's cost assumptions stay private.
+    ['GET', '/api/config', async (req) => {
+      const { labor, ...pricing } = await getPricing();
+      return json({ pricing: (await session(req))?.role === 'admin' ? { ...pricing, labor } : pricing });
+    }],
 
     // Type-ahead for the address box.
     ['GET', '/api/suggest', async (req, url) => {

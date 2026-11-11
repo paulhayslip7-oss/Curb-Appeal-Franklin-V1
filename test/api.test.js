@@ -37,13 +37,13 @@ test('full journey: estimate → account → client → visit report with photo'
   assert.equal(created.status, 201);
   const { property, claimToken } = created.data;
   assert.equal(property.status, 'estimate');
-  assert.equal(property.quote.monthly, 385); // $307 grounds care + $78 pet waste
+  assert.equal(property.quote.monthly, 437); // $350 grounds care + $87 pet waste
   assert.equal(property.claimHash, undefined, 'claim token must not leak back in the record');
 
   // Anonymous edits need the claim token.
   assert.equal((await client()('PUT', `/api/estimates/${property.id}`, { selections: {} })).status, 403);
   const edited = await visitor('PUT', `/api/estimates/${property.id}`, { claimToken, selections: { addons: {} } });
-  assert.equal(edited.data.property.quote.monthly, 307);
+  assert.equal(edited.data.property.quote.monthly, 350);
 
   // Sign up: the estimate becomes a lead tied to the account.
   const signup = await visitor('POST', '/api/auth/signup', { name: 'Pat Client', email: 'Pat@Example.com', phone: '615-555-0100', password: 'correct horse', estimateId: property.id, claimToken });
@@ -108,6 +108,9 @@ test('pricing can be changed by the owner only', async () => {
   const saved = await owner('PUT', '/api/admin/pricing', { pricing: { mowing: { base: 50 } } });
   assert.equal(saved.data.pricing.mowing.base, 50);
   assert.equal((await client()('GET', '/api/config')).data.pricing.mowing.base, 50);
+  // Crew cost assumptions are for the owner's eyes only.
+  assert.equal((await client()('GET', '/api/config')).data.pricing.labor, undefined);
+  assert.equal((await owner('GET', '/api/config')).data.pricing.labor.loadedCostPerHour, 31);
   await owner('PUT', '/api/admin/pricing', { reset: true });
 });
 

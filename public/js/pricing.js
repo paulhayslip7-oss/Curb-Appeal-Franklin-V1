@@ -1,9 +1,13 @@
 // Pricing engine. Runs in the browser (live totals as boxes are ticked) and
 // on the server (the saved, authoritative quote).
 //
-// Every number below is a starting point drawn from typical 2025–26 Middle
-// Tennessee residential rates. The owner can change all of them from the
-// admin Pricing tab without touching code.
+// The defaults are set from the labour up, not from what a solo operator
+// charges: each job should bring in roughly $95 for every crew hour it takes
+// (drive time included). Industry guides put healthy maintenance crews at
+// $75–95 per labour hour; with Franklin crew wages around $20–25/hr
+// (~$31/hr with payroll taxes and workers' comp) that keeps labour near a
+// third of revenue. The owner can change every number from the admin Pricing
+// tab without touching code.
 
 export const DEFAULT_PRICING = {
   // The budgetary range shown to prospects: total -low% … total +high%.
@@ -17,8 +21,8 @@ export const DEFAULT_PRICING = {
   //   per visit = lawn (base + per 1,000 sq ft) + upkeep (per shrub + per sq ft of bed)
   //   per year  = per visit x visits + mulch used for top-ups
   mowing: {
-    base: 38, per1kFirst10k: 3.6, per1kAfter10k: 2.4, minPerVisit: 48,
-    upkeepPerShrub: 0.75, upkeepPerBedSqft: 0.02, minUpkeepPerVisit: 15,
+    base: 42, per1kFirst10k: 4, per1kAfter10k: 3.4, minPerVisit: 55,
+    upkeepPerShrub: 0.9, upkeepPerBedSqft: 0.03, minUpkeepPerVisit: 20,
     mulchPerCubicYard: 105, mulchInchesPerYear: 1,
     visitsPerYear: 44,
   },
@@ -29,14 +33,22 @@ export const DEFAULT_PRICING = {
     { count: 4, pct: 10 },
   ],
   addons: {
-    petWaste: { enabled: true, perVisit: 18, perExtraDog: 4, visitsPerYear: 52 },
-    pressureWash: { enabled: true, perSqft: 0.16, minPerVisit: 119, visitsPerYear: 4 },
-    gutters: { enabled: true, base: 100, perRoofSqft: 0.03, visitsPerYear: 2 },
-    aeration: { enabled: true, base: 60, per1k: 14, minPerVisit: 129, visitsPerYear: 1 },
-    binCleaning: { enabled: true, perVisit: 15, visitsPerYear: 12 },
+    petWaste: { enabled: true, perVisit: 20, perExtraDog: 5, visitsPerYear: 52 },
+    pressureWash: { enabled: true, perSqft: 0.2, minPerVisit: 149, visitsPerYear: 4 },
+    gutters: { enabled: true, base: 125, perRoofSqft: 0.03, visitsPerYear: 2 },
+    aeration: { enabled: true, base: 70, per1k: 15, minPerVisit: 149, visitsPerYear: 1 },
+    binCleaning: { enabled: true, perVisit: 20, visitsPerYear: 12 },
     // Off by default: applying herbicide/fertilizer for hire in Tennessee
     // requires a TDA pest-control charter and a licensed applicator.
     lawnTreatment: { enabled: false, base: 30, per1k: 5.5, minPerVisit: 55, visitsPerYear: 7 },
+  },
+  // Owner-only assumptions used to check each job's profitability. Never
+  // sent to customers.
+  labor: {
+    loadedCostPerHour: 31, // wage + payroll taxes + workers' comp, per crew hour
+    targetRevenuePerHour: 90, // what a job should bring in per crew hour
+    driveMinutesPerVisit: 12,
+    mowSqftPerHour: 16000, // mow + edge + trim + blow, one person
   },
 };
 
@@ -75,6 +87,7 @@ export function mergePricing(saved) {
   const out = structuredClone(DEFAULT_PRICING);
   if (!saved || typeof saved !== 'object') return out;
   for (const k of ['rangeLowPct', 'rangeHighPct']) if (Number.isFinite(saved[k])) out[k] = saved[k];
+  if (saved.labor) for (const k of Object.keys(out.labor)) if (Number.isFinite(saved.labor[k]) && saved.labor[k] > 0) out.labor[k] = saved.labor[k];
   if (saved.mowing) for (const k of Object.keys(out.mowing)) if (Number.isFinite(saved.mowing[k])) out.mowing[k] = saved.mowing[k];
   if (Array.isArray(saved.bundle)) {
     out.bundle = saved.bundle.filter((b) => Number.isFinite(b?.count) && Number.isFinite(b?.pct)).map((b) => ({ count: b.count, pct: b.pct }));
@@ -165,6 +178,52 @@ export function computeQuote(pricing, m, selections = {}) {
     low: roundTo(monthly * (1 - pricing.rangeLowPct / 100), 5),
     high: roundTo(monthly * (1 + pricing.rangeHighPct / 100), 5),
     annual: Math.round(monthly * 12),
+  };
+}
+
+/**
+ * Owner's view of a job: roughly how many crew hours it takes in a year and
+ * what that leaves after labour and materials. Time is estimated from the
+ * same measurements the price is — treat it as a sanity check, not a timesheet.
+ * @param monthly  the monthly price to test (confirmed price, or the calculated one)
+ */
+export function jobEconomics(pricing, m, selections = {}, monthly) {
+  const L = pricing.labor;
+  const lawnK = num(m.lawnSqft) / 1000;
+  const visits = pricing.mowing.visitsPerYear;
+  const mowVisits = Math.min(visits, 34); // the lawn isn't cut in winter
+  const mowMin = 8 + (num(m.lawnSqft) / L.mowSqftPerHour) * 60;
+  const upkeepMin = Math.max(10, 0.6 * num(m.shrubCount) + 0.03 * num(m.bedSqft));
+  let minutes = mowVisits * mowMin + visits * (upkeepMin + L.driveMinutesPerVisit);
+
+  // Extras: [minutes on site, needs its own trip]
+  const extra = {
+    petWaste: [8 + 3 * Math.max(0, num(selections.dogs, 1) - 1), false],
+    binCleaning: [15, false],
+    pressureWash: [Math.max(60, 20 + (num(m.hardscapeSqft) / 500) * 60), true],
+    gutters: [60 + 0.02 * num(m.buildingSqft), true],
+    aeration: [30 + 6 * lawnK, true],
+    lawnTreatment: [15 + 2 * lawnK, false],
+  };
+  for (const [key, [min, ownTrip]] of Object.entries(extra)) {
+    const c = pricing.addons[key];
+    if (selections.addons?.[key] && c?.enabled) minutes += c.visitsPerYear * (min + (ownTrip ? L.driveMinutesPerVisit : 0));
+  }
+
+  const hours = minutes / 60;
+  const revenue = num(monthly) * 12;
+  const laborCost = hours * L.loadedCostPerHour;
+  const materials = mulchAnnual(pricing, m) * 0.5; // mulch at roughly half its installed price
+  return {
+    hoursPerYear: Math.round(hours),
+    minutesPerVisit: Math.round(mowMin + upkeepMin),
+    revenue: Math.round(revenue),
+    laborCost: Math.round(laborCost),
+    materials: Math.round(materials),
+    grossProfit: Math.round(revenue - laborCost - materials),
+    grossMarginPct: revenue ? Math.round(((revenue - laborCost - materials) / revenue) * 100) : 0,
+    revenuePerHour: hours ? Math.round(revenue / hours) : 0,
+    onTarget: hours ? revenue / hours >= L.targetRevenuePerHour : true,
   };
 }
 

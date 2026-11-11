@@ -27,9 +27,11 @@ All numbers live in **Admin → Pricing** and can be changed without touching co
 
 **The base plan is all-inclusive.** Every client gets year-round grounds care: lawn, bed weeding, shrub trimming, leaf clearing and mulch top-ups at every visit (about 44 visits a year — weekly March–November, every other week in winter). Those are not sold separately; the pitch is that staying on top of a yard all year means there are never big weed-pull or leaf-removal jobs.
 
-Base plan per visit = lawn (by lawn size) + bed & shrub upkeep (by shrub count and bed size). Yearly = per visit × visits + the year's mulch, split into 12 payments. Example with the defaults: 8,000 sq ft lawn, 15 shrubs, 210 sq ft of beds ≈ $82 a visit ≈ **$307/month**.
+Base plan per visit = lawn (by lawn size) + bed & shrub upkeep (by shrub count and bed size). Yearly = per visit × visits + the year's mulch, split into 12 payments. Example with the defaults: 8,000 sq ft lawn, 15 shrubs, 210 sq ft of beds ≈ $94 a visit ≈ **$350/month**; a half-acre property with a 16,000 sq ft lawn ≈ **$585/month**.
 
-Optional extras (pet waste, pressure washing, gutters, aeration, bin cleaning) are priced per visit × visits per year ÷ 12; weekly pet waste removal adds about $78/month.
+Optional extras (pet waste, pressure washing, gutters, aeration, bin cleaning) are priced per visit × visits per year ÷ 12; weekly pet waste removal adds about $87/month.
+
+**Priced for a crew, not a solo operator.** The defaults aim for about $90–100 of revenue per crew hour including drive time, which keeps crew cost near a third of revenue at roughly $31/hour loaded. Admin shows a private "Does this job pay?" check on every property (estimated crew hours, crew cost, what's left, revenue per crew hour) and flags jobs below your target. The crew-cost assumptions are editable under Admin → Pricing and are never sent to customers.
 
 > **Lawn fertilization & weed control is switched off by default.** Applying those products for hire in Tennessee requires a state pest-control charter and licensed applicator. Turn it on in Admin → Pricing once that's in place.
 

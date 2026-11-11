@@ -1,7 +1,7 @@
 // Owner admin: leads pipeline, client records, visit reports, pricing.
 
 import { $, $$, api, authModal, esc, fmtDate, money, sqft, STATUS_LABEL, toast, todayIso } from './common.js';
-import { ADDONS, CORE, planTasks } from './pricing.js';
+import { ADDONS, CORE, jobEconomics, planTasks } from './pricing.js';
 import { lightbox, visitHtml } from './visits.js';
 
 const app = $('#app');
@@ -14,6 +14,7 @@ async function load() {
   state.pricing = pricing;
 }
 
+const econOf = (p) => jobEconomics(state.pricing, p.measurements, p.selections, p.finalMonthly || p.quote.monthly);
 const priceOf = (p) => (p.finalMonthly ? `${money(p.finalMonthly)}/mo` : `${money(p.quote.low)}–${money(p.quote.high)}`);
 
 // ---------- pipeline ----------
@@ -34,7 +35,7 @@ function pipelineHtml() {
     </div>
     <div class="filters">${filters.map(([k, label]) => `<button class="chip ${state.filter === k ? 'on' : ''}" data-filter="${k}">${label} (${count(k)})</button>`).join('')}</div>
     ${rows.length ? `<div class="table-wrap"><table>
-      <thead><tr><th>Address</th><th>Contact</th><th>Status</th><th>Lawn</th><th>Add-ons</th><th>Monthly</th><th>Created</th></tr></thead>
+      <thead><tr><th>Address</th><th>Contact</th><th>Status</th><th>Lawn</th><th>Add-ons</th><th>Monthly</th><th>Per crew hour</th><th>Created</th></tr></thead>
       <tbody>${rows.map((p) => `<tr data-open="${p.id}" tabindex="0">
         <td><strong>${esc(p.address)}</strong>${(p.messages || []).at(-1)?.from === 'client' ? ' <span class="pill lead">New note</span>' : ''}</td>
         <td>${p.contact ? `${esc(p.contact.name)}<br><span class="small muted">${esc(p.contact.phone || p.contact.email)}</span>` : '<span class="muted">No account yet</span>'}</td>
@@ -42,6 +43,7 @@ function pipelineHtml() {
         <td class="num">${sqft(p.measurements.lawnSqft)} sq ft</td>
         <td class="num">${p.quote.addons.length}</td>
         <td class="num"><strong>${priceOf(p)}</strong></td>
+        <td class="num" style="color:${econOf(p).onTarget ? 'var(--green-700)' : 'var(--red)'}">${money(econOf(p).revenuePerHour)}</td>
         <td class="small">${esc(fmtDate(p.createdAt, { month: 'short', day: 'numeric' }))}</td>
       </tr>`).join('')}</tbody></table></div>` : '<div class="empty">Nothing here yet. Every address entered on the website shows up in this list.</div>'}`;
 }
@@ -54,6 +56,7 @@ function detailHtml() {
   const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.address)}`;
   const lines = [p.quote.core, ...p.quote.addons];
   const tasks = planTasks(p.selections);
+  const e = econOf(p);
   // Pre-tick what happens on a routine visit; seasonal work is ticked when it's done.
   const everyVisit = new Set([...CORE.tasks, ...ADDONS.find((a) => a.key === 'petWaste').tasks]);
   return `
@@ -100,6 +103,19 @@ function detailHtml() {
             <div class="field"><label for="s-notes">Private notes <span class="muted" style="font-weight:400">(never shown to the client)</span></label><textarea id="s-notes" rows="3" maxlength="4000">${esc(p.adminNotes || '')}</textarea></div>
             <button class="btn small">Save</button>
           </form>
+        </div>
+        <div class="card" style="border-color:${e.onTarget ? 'var(--green-500)' : 'var(--red)'}">
+          <h2 style="font-size:1.3rem">Does this job pay?</h2>
+          <p class="small muted">At ${p.finalMonthly ? 'your confirmed price' : 'the calculated price'} of <strong>${money(p.finalMonthly || p.quote.monthly)}/mo</strong>, with a crew doing the work. Estimated from the measurements — check it against real time on site.</p>
+          <dl class="kv">
+            <dt>Yearly revenue</dt><dd class="num">${money(e.revenue)}</dd>
+            <dt>Crew time</dt><dd class="num">~${e.hoursPerYear} hrs/yr (${e.minutesPerVisit} min on site per mowing visit)</dd>
+            <dt>Crew cost at ${money(state.pricing.labor.loadedCostPerHour)}/hr</dt><dd class="num">−${money(e.laborCost)}</dd>
+            <dt>Mulch</dt><dd class="num">−${money(e.materials)}</dd>
+            <dt>Left for overhead &amp; profit</dt><dd class="num">${money(e.grossProfit)} (${e.grossMarginPct}%)</dd>
+            <dt>Revenue per crew hour</dt><dd class="num" style="color:${e.onTarget ? 'var(--green-700)' : 'var(--red)'}">${money(e.revenuePerHour)} <span class="muted" style="font-weight:400">(target ${money(state.pricing.labor.targetRevenuePerHour)})</span></dd>
+          </dl>
+          ${e.onTarget ? '' : '<p class="warn" style="margin:10px 0 0">Below your target. Raise the confirmed price, or check whether the shrub and bed numbers are overstated.</p>'}
         </div>
         <div class="card">
           <h2 style="font-size:1.3rem">Plan &amp; measurements</h2>
@@ -155,6 +171,7 @@ function renderPhotoPick() {
 const LABELS = {
   base: 'Lawn: base per visit ($)', per1kFirst10k: 'Lawn: per 1,000 sq ft, first 10k ($)', per1kAfter10k: 'Lawn: per 1,000 sq ft after 10k ($)', minPerVisit: 'Minimum per visit ($)', visitsPerYear: 'Visits per year',
   upkeepPerShrub: 'Bed & shrub upkeep: per shrub, per visit ($)', upkeepPerBedSqft: 'Bed & shrub upkeep: per sq ft of bed, per visit ($)', minUpkeepPerVisit: 'Bed & shrub upkeep: minimum per visit ($)', mulchPerCubicYard: 'Mulch top-ups: per cubic yard ($)', mulchInchesPerYear: 'Mulch top-ups: inches added per year',
+  loadedCostPerHour: 'Crew cost per hour, with taxes & insurance ($)', targetRevenuePerHour: 'Target revenue per crew hour ($)', driveMinutesPerVisit: 'Drive time per visit (minutes)', mowSqftPerHour: 'Mowing speed: sq ft per hour, one person',
   perShrub: 'Per shrub ($)', perBedSqft: 'Per sq ft of bed ($)', perVisit: 'Per visit ($)', perExtraDog: 'Per extra dog ($)', perSqft: 'Per sq ft ($)', mowMultiple: 'Multiple of a mowing visit (×)',
   perCubicYard: 'Per cubic yard installed ($)', depthInches: 'Mulch depth (inches)', perRoofSqft: 'Per sq ft of roof ($)', per1k: 'Per 1,000 sq ft of lawn ($)',
 };
@@ -169,6 +186,7 @@ function pricingHtml() {
         ${ADDONS.map((a) => `<div class="card"><h3><span>${a.icon} ${esc(a.label)}</span><label style="margin:0;display:inline-flex;gap:6px;align-items:center;font:400 .8rem var(--sans)"><input type="checkbox" data-enabled="${a.key}" ${pr.addons[a.key].enabled ? 'checked' : ''}>Offer</label></h3>
           ${a.key === 'lawnTreatment' ? '<p class="warn">Applying fertilizer or weed killer for hire in Tennessee requires a state pest-control charter and a licensed applicator (TN Dept. of Agriculture). Leave this off until you are licensed or have a licensed subcontractor.</p>' : ''}
           ${fields(`addons.${a.key}`, pr.addons[a.key])}</div>`).join('')}
+        <div class="card"><h3>Crew cost assumptions</h3><p class="small muted">Private — used only for the "Does this job pay?" check on each property. Healthy maintenance companies bring in about $75–95 per crew hour and keep crew cost near a third of revenue.</p>${fields('labor', pr.labor)}</div>
         <div class="card"><h3>Range &amp; bundle discount</h3>
           <div class="f"><label for="p-low" style="margin:0;font-weight:400">Range: below calculated (%)</label><input id="p-low" type="number" min="0" max="50" step="any" data-p="rangeLowPct" value="${pr.rangeLowPct}"></div>
           <div class="f"><label for="p-high" style="margin:0;font-weight:400">Range: above calculated (%)</label><input id="p-high" type="number" min="0" max="100" step="any" data-p="rangeHighPct" value="${pr.rangeHighPct}"></div>

@@ -1,40 +1,40 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { DEFAULT_PRICING, computeQuote, mergePricing, planTasks } from '../public/js/pricing.js';
+import { DEFAULT_PRICING, computeQuote, jobEconomics, mergePricing, planTasks } from '../public/js/pricing.js';
 
 const yard = { lawnSqft: 8000, shrubCount: 15, bedSqft: 210, hardscapeSqft: 1000, buildingSqft: 2500 };
 
 test('core plan: 8,000 sq ft lawn, 15 shrubs, 210 sq ft of beds', () => {
   const q = computeQuote(DEFAULT_PRICING, yard, {});
-  // lawn $66.80 + upkeep (15 x $0.75 + 210 x $0.02 = $15.45)
-  assert.equal(q.core.perVisit, 82.25);
+  // lawn $74 + upkeep (15 x $0.90 + 210 x $0.03 = $19.80, so the $20 minimum)
+  assert.equal(q.core.perVisit, 94);
   assert.equal(q.core.visitsPerYear, 44);
   assert.equal(q.core.materials, 68); // ~0.65 cu yd of mulch
-  assert.equal(q.monthly, 307);
+  assert.equal(q.monthly, 350);
   assert.ok(q.low < q.monthly && q.high > q.monthly);
   assert.equal(q.low % 5, 0);
   assert.equal(q.addons.length, 0);
 });
 
 test('tiny yards hit the lawn and upkeep minimums', () => {
-  assert.equal(computeQuote(DEFAULT_PRICING, { lawnSqft: 500 }, {}).core.perVisit, 48 + 15);
+  assert.equal(computeQuote(DEFAULT_PRICING, { lawnSqft: 500 }, {}).core.perVisit, 55 + 20);
 });
 
 test('bigger lawns and more plantings cost more', () => {
   const p = (m) => computeQuote(DEFAULT_PRICING, m, {}).core.perVisit;
   assert.ok(p({ lawnSqft: 5000 }) < p({ lawnSqft: 10000 }) && p({ lawnSqft: 10000 }) < p({ lawnSqft: 20000 }));
-  assert.equal(p({ lawnSqft: 20000 }), 98 + 15);
+  assert.equal(p({ lawnSqft: 20000 }), 116 + 20);
   assert.ok(p({ lawnSqft: 8000, shrubCount: 40, bedSqft: 560 }) > p(yard));
 });
 
 test('add-ons are priced from measurements and annualised', () => {
   const q = computeQuote(DEFAULT_PRICING, yard, { addons: { gutters: true, petWaste: true, pressureWash: true }, dogs: 2 });
   const by = Object.fromEntries(q.addons.map((a) => [a.key, a]));
-  assert.equal(by.gutters.perVisit, 175); // $100 + 2,500 sq ft roof x $0.03
-  assert.equal(by.petWaste.perVisit, 22); // $18 + one extra dog
-  assert.equal(by.pressureWash.perVisit, 160); // 1,000 sq ft x $0.16
+  assert.equal(by.gutters.perVisit, 200); // $125 + 2,500 sq ft roof x $0.03
+  assert.equal(by.petWaste.perVisit, 25); // $20 + one extra dog
+  assert.equal(by.pressureWash.perVisit, 200); // 1,000 sq ft x $0.20
   assert.equal(q.discountPct, 8); // three add-ons
-  const addons = 175 * 2 / 12 + 22 * 52 / 12 + 160 * 4 / 12;
+  const addons = 200 * 2 / 12 + 25 * 52 / 12 + 200 * 4 / 12;
   assert.equal(q.monthly, Math.round(q.core.monthly + addons * 0.92));
 });
 
@@ -56,6 +56,23 @@ test('mergePricing keeps defaults for missing or junk values', () => {
   assert.equal(p.addons.gutters.base, 90);
   assert.equal(p.addons.gutters.enabled, false);
   assert.equal(p.addons.bogus, undefined);
+});
+
+test('default prices clear the crew-hour target on typical Franklin yards', () => {
+  const yards = [
+    yard,
+    { lawnSqft: 9500, shrubCount: 27, bedSqft: 760, hardscapeSqft: 220, buildingSqft: 1600 },
+    { lawnSqft: 16000, shrubCount: 35, bedSqft: 700, hardscapeSqft: 1800, buildingSqft: 3200 },
+  ];
+  for (const m of yards) {
+    for (const sel of [{}, { addons: { petWaste: true, pressureWash: true, gutters: true, aeration: true, binCleaning: true } }]) {
+      const e = jobEconomics(DEFAULT_PRICING, m, sel, computeQuote(DEFAULT_PRICING, m, sel).monthly);
+      assert.ok(e.onTarget, 'only $' + e.revenuePerHour + ' per crew hour on ' + m.lawnSqft + ' sq ft');
+      assert.ok(e.grossMarginPct >= 55 && e.grossMarginPct <= 75);
+    }
+  }
+  // Under-pricing a job is flagged.
+  assert.equal(jobEconomics(DEFAULT_PRICING, yard, {}, 200).onTarget, false);
 });
 
 test('planTasks lists core tasks plus the selected add-ons', () => {
