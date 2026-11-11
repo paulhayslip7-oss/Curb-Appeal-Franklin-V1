@@ -1,0 +1,16 @@
+{
+  "name": "curb-appeal-website-v1",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Curb Appeal Franklin — instant budgetary estimates from aerial imagery, plus client dashboards.",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --test"
+  },
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0"
+  }
+}

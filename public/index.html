@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Curb Appeal Franklin — One monthly price for your whole exterior</title>
+  <meta name="description" content="Type your address and see a budgetary monthly price for year-round lawn and exterior care in Franklin, TN — measured from aerial imagery in about a minute.">
+  <link rel="stylesheet" href="/vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="logo" href="/"><span class="logo-mark" aria-hidden="true">❧</span>Curb Appeal Franklin</a>
+      <nav>
+        <a class="hide-sm" href="#how">How it works</a>
+        <a class="hide-sm" href="#dashboard">Your dashboard</a>
+        <a class="hide-sm" href="#services">Services</a>
+        <a class="btn ghost small" id="account-link" href="/portal.html">Client sign in</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="hero">
+      <div class="container">
+        <div class="eyebrow">Exterior concierge · Franklin, Tennessee</div>
+        <h1>One monthly price.<br>A home that always looks cared for.</h1>
+        <p class="lead">Type your address. We measure your yard from above and build your budgetary monthly price in about a minute — no site visit, no phone tag.</p>
+        <form class="address-form" id="address-form">
+          <input id="address" name="address" autocomplete="street-address" placeholder="Your street address, city" aria-label="Your street address" required>
+          <button class="btn" type="submit">Measure my yard</button>
+        </form>
+        <div class="error" id="address-error" role="alert"></div>
+        <ul class="hero-points">
+          <li>Same payment every month, all year</li>
+          <li>Lawn, beds, pet waste, pressure washing &amp; more</li>
+          <li>A photo report after every visit</li>
+        </ul>
+      </div>
+    </div>
+
+    <section id="estimator" hidden aria-live="polite">
+      <div class="container">
+        <div class="est-head">
+          <h2 id="est-address"></h2>
+          <button class="linkbtn" id="change-address">Change address</button>
+        </div>
+        <div class="est-grid">
+          <div>
+            <div class="card map-card">
+              <div class="map-wrap">
+                <div id="map" role="application" aria-label="Aerial view of the property with its outline"></div>
+                <div class="analyzing" id="analyzing" hidden>Measuring your yard…</div>
+              </div>
+              <div class="map-foot">
+                <div class="legend" aria-label="Map colours">
+                  <span><i style="background:#56d660"></i>Lawn</span>
+                  <span><i style="background:#106e34"></i>Shrubs &amp; plantings</span>
+                  <span><i style="background:#50a0ff"></i>Hard surfaces</span>
+                  <span><i style="background:#f06048"></i>House</span>
+                  <label style="margin:0 0 0 auto;font-weight:400;display:inline-flex;gap:6px;align-items:center"><input type="checkbox" id="overlay-toggle" checked style="width:16px;height:16px">Show colours</label>
+                </div>
+                <p class="small muted" id="map-tip" style="margin:0"><strong>Not quite your property line?</strong> Drag the white corners to fix it — the numbers update as you go.</p>
+                <div class="tiles" id="tiles"></div>
+                <p class="small" style="margin:10px 0 0"><button class="linkbtn" id="edit-measure">Adjust these numbers</button></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="plan">
+            <h3><span>Your plan</span></h3>
+            <div class="core-card" id="core-card"></div>
+            <h3 style="margin-top:22px"><span>Add what you'd like handled</span><span class="small muted" id="bundle-hint" style="font:400 .85rem var(--sans)"></span></h3>
+            <div id="addons"></div>
+            <div class="summary" id="summary"></div>
+            <p class="fine">This is a budgetary range from aerial measurements — not a final quote. Save it and we'll schedule a free walkthrough to confirm your fixed monthly price in person.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="how">
+      <div class="container">
+        <div class="eyebrow">How it works</div>
+        <h2>From address to a number you can plan around</h2>
+        <div class="steps">
+          <div class="step"><h3>We map your property</h3><p class="muted">Enter your address and we pull an aerial view, outline your lot, and measure the lawn, plantings and hard surfaces.</p></div>
+          <div class="step"><h3>You build your plan</h3><p class="muted">Start with weekly lawn care, then tick the extras you'd rather never think about again. The monthly price updates as you go.</p></div>
+          <div class="step"><h3>We confirm in person</h3><p class="muted">Save your estimate and we'll walk the property with you, confirm the details, and lock in one fixed monthly price for the year.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="dashboard" class="section-alt">
+      <div class="container split">
+        <div>
+          <div class="eyebrow">Your client dashboard</div>
+          <h2>You'll never wonder what we did — or whether we came.</h2>
+          <p class="muted">Most service companies leave you guessing. Every Curb Appeal client gets a private dashboard that shows exactly what the job is and exactly what was done.</p>
+          <ul class="ticks">
+            <li><strong>A report after every visit</strong> — the checklist we worked from, what was completed, and anything we skipped and why.</li>
+            <li><strong>Before &amp; after photos</strong> — time-stamped, on your account, for every visit.</li>
+            <li><strong>Your plan in plain English</strong> — what's included, how often, and your fixed monthly price.</li>
+            <li><strong>A direct line</strong> — leave a note for the crew ("gate code changed", "skip next week") right from the dashboard.</li>
+          </ul>
+        </div>
+        <div class="visit sample" aria-label="Sample visit report">
+          <span class="sample-tag">SAMPLE</span>
+          <div class="visit-head"><h3>Thursday, June 12</h3><span class="visit-meta">48 min on site · Crew: Paul</span></div>
+          <ul class="checks">
+            <li>Mow lawn</li><li>Edge walks, driveway &amp; beds</li><li>String-trim around obstacles</li><li>Blow off hard surfaces</li><li>Scoop &amp; remove pet waste</li>
+            <li class="skip">Hand-weed planting beds<span class="why">Beds too wet after rain — first thing next visit</span></li>
+          </ul>
+          <div class="note">Sprinkler head by the mailbox is leaking — flagged it with a marker so it's easy to find.</div>
+          <div class="photos">
+            <figure><div class="swatch" style="background:linear-gradient(135deg,#7a8b5a,#b5b08a)">🌿</div><figcaption>Before</figcaption></figure>
+            <figure><div class="swatch" style="background:linear-gradient(135deg,#2f7d3c,#7fc46b)">🌿</div><figcaption>After</figcaption></figure>
+            <figure><div class="swatch" style="background:linear-gradient(135deg,#3a8a46,#a4d68a)">🏡</div><figcaption>After</figcaption></figure>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="services">
+      <div class="container">
+        <div class="eyebrow">What we take off your plate</div>
+        <h2>Everything outside, bundled into one fixed payment</h2>
+        <div class="service-grid" id="service-grid"></div>
+        <p style="margin-top:28px"><a class="btn" href="#address">Get my monthly price</a></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <strong style="color:#fff">Curb Appeal Franklin</strong> · Locally owned in Franklin, TN · <a href="tel:+16159451614">(615) 945-1614</a>
+      <p class="small" style="margin:10px 0 0">Online prices are budgetary ranges based on aerial measurements. Your fixed monthly price is confirmed after a free on-site walkthrough. Aerial imagery: TDOT Aerial Surveys / Esri. Building outlines: FEMA USA Structures.</p>
+    </div>
+  </footer>
+
+  <script src="/vendor/leaflet/leaflet.js"></script>
+  <script type="module" src="/js/estimate.js"></script>
+</body>
+</html>

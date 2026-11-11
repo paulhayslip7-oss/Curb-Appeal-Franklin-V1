@@ -1,0 +1,85 @@
+# Curb Appeal Website v1
+
+Website for **Curb Appeal Franklin** — year-round exterior care sold as one fixed monthly price.
+
+A visitor types their address and, in about a minute, sees their property from above, how big the lawn is, and a **budgetary monthly range** for the plan they build. Every address becomes a lead. Clients get a private dashboard showing their plan and a photo report of every visit.
+
+## What's in it
+
+| Page | Who it's for | What it does |
+| --- | --- | --- |
+| `/` | Prospects | Address → aerial map → measured yard → pick add-ons → monthly range → create account |
+| `/portal.html` | Clients & leads | Plan and price, next visit, visit reports (checklist, crew notes, before/after photos), notes to the crew |
+| `/admin.html` | You | Leads pipeline, contact details, confirm price, convert to client, log visits with photos, edit all pricing |
+
+## How the measuring works
+
+1. **Find the house** — Tennessee's statewide address points (rooftop-accurate), with the US Census geocoder as a fallback.
+2. **Outline the buildings** — FEMA's public "USA Structures" footprints.
+3. **Guess the lot** — squared up to the house, from the street to a typical back-yard depth, stopping halfway to each neighbour. *There is no free parcel-boundary data for Williamson County, so this is an educated guess — the visitor can drag the corners to fix it.*
+4. **Classify the aerial photo** (TDOT 6-inch imagery; Esri as fallback) — pavement, shrubs/plantings, and house are picked out; what's left is lawn.
+
+It is a budgetary tool, not a survey. Expect the lawn figure to be in the right ballpark and the shrub count to be rough; both can be corrected by the visitor on the page and by you after the walkthrough. Known weak spots: corner lots and cul-de-sacs (lot shape), dark asphalt or gravel driveways (read as lawn), and winter imagery (bare trees aren't counted).
+
+## Pricing
+
+All numbers live in **Admin → Pricing** and can be changed without touching code. The defaults (in `public/js/pricing.js`) are typical 2025–26 Middle Tennessee residential rates — treat them as a starting point and tune them to your costs.
+
+Each service = price per visit × visits per year ÷ 12. Example with the defaults: an 8,000 sq ft lawn is about $67 a mow × 34 mows ≈ **$189/month**; weekly pet waste removal adds about $78/month.
+
+> **Lawn fertilization & weed control is switched off by default.** Applying those products for hire in Tennessee requires a state pest-control charter and licensed applicator. Turn it on in Admin → Pricing once that's in place.
+
+## Run it on your computer
+
+Needs [Node.js](https://nodejs.org) 20 or newer.
+
+```bash
+npm install
+```
+
+```bash
+ADMIN_EMAIL=you@example.com ADMIN_PASSWORD='pick-a-long-password' npm start
+```
+
+Open http://localhost:3000. Sign in at `/admin.html` with that email and password. Data is saved in the `data/` folder.
+
+```bash
+npm test
+```
+
+## Put it online (Netlify)
+
+The repo is ready for Netlify: pages are served from `public/`, the API runs as a Netlify Function, and data is kept in Netlify Blobs (no database to set up).
+
+1. In Netlify: **Add new site → Import an existing project** and pick this repository. The build settings are read from `netlify.toml`.
+2. Under **Site configuration → Environment variables** add:
+   - `ADMIN_EMAIL` — the email you'll sign in to the admin with
+   - `ADMIN_PASSWORD` — a long password
+   - `SESSION_SECRET` — any long random string
+3. Deploy.
+
+The Netlify storage adapter (`netlifyStore` in `src/store.js`) has not yet been exercised on a live Netlify site — test sign-up, a visit report and a photo upload on the first deploy before sharing the link.
+
+It also runs on any Node host with a persistent disk (`npm start`, set `DATA_DIR`).
+
+## Good next steps
+
+- **Email/text alerts** when a new lead signs up or a client leaves a note (today you check the admin page).
+- **Real parcel lines** via a paid parcel API (e.g. Regrid) to replace the lot guess.
+- **Password reset** by email.
+- **Online payments** (Stripe subscriptions) for the fixed monthly charge.
+- **Imagery terms** — TDOT imagery is public. Esri World Imagery (fallback only) may need an ArcGIS account for commercial use.
+
+## Layout
+
+```
+public/            pages, styles and browser code
+  js/analyze.js    aerial-image yard measurement
+  js/pricing.js    pricing engine + default rates (shared with the server)
+src/app.js         the API (accounts, estimates, visits, photos, admin)
+src/geo.js         address lookup, building footprints, lot guess
+src/store.js       storage: files locally, Netlify Blobs when deployed
+server.js          local / any-host server
+netlify/           Netlify entry point
+test/              automated tests
+```
