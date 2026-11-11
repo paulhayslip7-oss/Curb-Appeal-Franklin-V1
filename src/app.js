@@ -2,7 +2,7 @@
 // It is written against web-standard Request/Response so the same code runs
 // under the plain Node server (server.js) and as a Netlify Function.
 
-import { lookupAddress } from './geo.js';
+import { lookupAddress, suggestAddresses } from './geo.js';
 import { createToken, hashPassword, newId, readToken, safeEqual, userIdFor, verifyPassword } from './auth.js';
 import { ADDONS, DEFAULT_PRICING, computeQuote, mergePricing, planTasks } from '../public/js/pricing.js';
 
@@ -133,6 +133,13 @@ export function createApp(store, env = {}) {
   const routes = [
     // ---------- public ----------
     ['GET', '/api/config', async () => json({ pricing: await getPricing() })],
+
+    // Type-ahead for the address box.
+    ['GET', '/api/suggest', async (req, url) => {
+      rateLimit(req, 'suggest', 150);
+      const q = str(url.searchParams.get('q'), 120);
+      return json({ suggestions: q.length >= 3 ? await suggestAddresses(q) : [] });
+    }],
 
     ['GET', '/api/lookup', async (req, url) => {
       rateLimit(req, 'lookup', 20);

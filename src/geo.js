@@ -40,6 +40,20 @@ async function tnAddressPoint(singleLine) {
   };
 }
 
+/**
+ * Address suggestions while typing (Tennessee address points, nearest to
+ * Franklin first). Returns up to 6 display strings; never throws.
+ */
+export async function suggestAddresses(text) {
+  const url = `${TN_LOCATOR.replace('findAddressCandidates', 'suggest')}?${new URLSearchParams({ text, location: '-86.8689,35.9251', maxSuggestions: '6', f: 'json' })}`;
+  try {
+    const data = await getJson(url, 4000);
+    return (data.suggestions || []).filter((s) => !s.isCollection && /^\d/.test(s.text)).map((s) => titleCase(s.text));
+  } catch {
+    return [];
+  }
+}
+
 async function censusPoint(singleLine) {
   const url = `${CENSUS}?${new URLSearchParams({ address: singleLine, benchmark: 'Public_AR_Current', format: 'json' })}`;
   const data = await getJson(url);

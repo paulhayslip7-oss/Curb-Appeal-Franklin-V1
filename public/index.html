@@ -29,7 +29,8 @@
         <h1>We stay on top of your yard,<br>so it never gets away from you.</h1>
         <p class="lead">Lawn, weeds, shrubs, leaves and mulch — handled at every visit, all year, for one fixed monthly price. Type your address and see yours in about a minute.</p>
         <form class="address-form" id="address-form">
-          <input id="address" name="address" autocomplete="street-address" placeholder="Your street address, city" aria-label="Your street address" required>
+          <input id="address" name="address" autocomplete="off" placeholder="Start typing your street address" aria-label="Your street address" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="address-suggestions" required>
+          <ul class="suggest" id="address-suggestions" role="listbox" aria-label="Matching addresses" hidden></ul>
           <button class="btn" type="submit">Measure my yard</button>
         </form>
         <div class="error" id="address-error" role="alert"></div>

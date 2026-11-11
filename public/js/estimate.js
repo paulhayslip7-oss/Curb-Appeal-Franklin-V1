@@ -50,6 +50,61 @@ $('#address-form').addEventListener('submit', async (e) => {
     btn.textContent = 'Measure my yard';
   }
 });
+// ---------- address suggestions while typing ----------
+{
+  const input = $('#address');
+  const list = $('#address-suggestions');
+  let items = [];
+  let active = -1;
+  let timer;
+  let seq = 0;
+  const close = () => { list.hidden = true; items = []; active = -1; input.setAttribute('aria-expanded', 'false'); input.removeAttribute('aria-activedescendant'); };
+  const paint = () => {
+    list.innerHTML = items.map((t, i) => `<li role="option" id="sug-${i}" aria-selected="${i === active}">${esc(t)}</li>`).join('');
+    list.hidden = !items.length;
+    input.setAttribute('aria-expanded', String(items.length > 0));
+    if (active >= 0) input.setAttribute('aria-activedescendant', `sug-${active}`); else input.removeAttribute('aria-activedescendant');
+  };
+  const choose = (i) => {
+    input.value = items[i];
+    close();
+    $('#address-form').requestSubmit();
+  };
+  input.addEventListener('input', () => {
+    clearTimeout(timer);
+    const q = input.value.trim();
+    if (q.length < 3) { seq++; close(); return; }
+    timer = setTimeout(async () => {
+      const mine = ++seq;
+      try {
+        const { suggestions } = await api('GET', `/api/suggest?q=${encodeURIComponent(q)}`);
+        if (mine !== seq) return; // a newer keystroke won
+        items = suggestions;
+        active = -1;
+        paint();
+      } catch { /* suggestions are a nicety; typing the full address still works */ }
+    }, 180);
+  });
+  input.addEventListener('keydown', (e) => {
+    if (list.hidden) return;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      active = (active + (e.key === 'ArrowDown' ? 1 : -1) + items.length + (active < 0 && e.key === 'ArrowUp' ? 1 : 0)) % items.length;
+      paint();
+    } else if (e.key === 'Enter' && active >= 0) {
+      e.preventDefault();
+      choose(active);
+    } else if (e.key === 'Escape') close();
+  });
+  // mousedown (not click) so it lands before the input loses focus.
+  list.addEventListener('mousedown', (e) => {
+    const li = e.target.closest('li');
+    if (li) { e.preventDefault(); choose([...list.children].indexOf(li)); }
+  });
+  input.addEventListener('blur', () => setTimeout(close, 120));
+  $('#address-form').addEventListener('submit', () => { seq++; clearTimeout(timer); close(); });
+}
+
 $('#change-address').addEventListener('click', () => {
   window.scrollTo({ top: 0, behavior: 'smooth' });
   $('#address').focus();
