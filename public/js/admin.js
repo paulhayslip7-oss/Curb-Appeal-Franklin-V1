@@ -112,7 +112,7 @@ function detailHtml() {
             ${ADDONS.map((a) => `<label style="display:flex;gap:8px;align-items:center;font-weight:400;margin-bottom:6px"><input type="checkbox" data-addon="${a.key}" ${p.selections.addons[a.key] ? 'checked' : ''}>${esc(a.label)}${state.pricing.addons[a.key].enabled ? '' : ' <span class="muted small">(not offered)</span>'}</label>`).join('')}
             <button class="btn small" style="margin-top:8px">Recalculate &amp; save</button>
           </form>
-          <ul class="plan-list">${lines.map((l) => `<li><span><strong>${esc(l.label)}</strong><br><span class="cad">${money(l.perVisit)} × ${l.visitsPerYear} visits/yr</span></span><span class="num">${money(l.monthly)}/mo</span></li>`).join('')}
+          <ul class="plan-list">${lines.map((l) => `<li><span><strong>${esc(l.label)}</strong><br><span class="cad">${money(l.perVisit)} × ${l.visitsPerYear} visits/yr${l.materials ? ` + ${money(l.materials)} mulch` : ''}</span></span><span class="num">${money(l.monthly)}/mo</span></li>`).join('')}
             ${p.quote.discountPct ? `<li><span>Bundle discount (${p.quote.discountPct}%)</span><span class="num">−${money(p.quote.discountMonthly)}/mo</span></li>` : ''}
             <li><strong>Calculated</strong><strong class="num">${money(p.quote.monthly)}/mo · ${money(p.quote.annual)}/yr</strong></li>
             <li><span>Range shown to prospect</span><span class="num">${money(p.quote.low)}–${money(p.quote.high)}</span></li>
@@ -153,7 +153,8 @@ function renderPhotoPick() {
 
 // ---------- pricing ----------
 const LABELS = {
-  base: 'Base per visit ($)', per1kFirst10k: 'Per 1,000 sq ft, first 10k ($)', per1kAfter10k: 'Per 1,000 sq ft after 10k ($)', minPerVisit: 'Minimum per visit ($)', visitsPerYear: 'Visits per year',
+  base: 'Lawn: base per visit ($)', per1kFirst10k: 'Lawn: per 1,000 sq ft, first 10k ($)', per1kAfter10k: 'Lawn: per 1,000 sq ft after 10k ($)', minPerVisit: 'Minimum per visit ($)', visitsPerYear: 'Visits per year',
+  upkeepPerShrub: 'Bed & shrub upkeep: per shrub, per visit ($)', upkeepPerBedSqft: 'Bed & shrub upkeep: per sq ft of bed, per visit ($)', minUpkeepPerVisit: 'Bed & shrub upkeep: minimum per visit ($)', mulchPerCubicYard: 'Mulch top-ups: per cubic yard ($)', mulchInchesPerYear: 'Mulch top-ups: inches added per year',
   perShrub: 'Per shrub ($)', perBedSqft: 'Per sq ft of bed ($)', perVisit: 'Per visit ($)', perExtraDog: 'Per extra dog ($)', perSqft: 'Per sq ft ($)', mowMultiple: 'Multiple of a mowing visit (×)',
   perCubicYard: 'Per cubic yard installed ($)', depthInches: 'Mulch depth (inches)', perRoofSqft: 'Per sq ft of roof ($)', per1k: 'Per 1,000 sq ft of lawn ($)',
 };
@@ -164,7 +165,7 @@ function pricingHtml() {
     <p class="muted">These numbers drive every estimate on the website. Each service is priced per visit, multiplied by visits per year, and spread over 12 equal monthly payments. Changes apply to new estimates right away.</p>
     <form id="pricing-form">
       <div class="pricing-grid">
-        <div class="card"><h3>${esc(CORE.label)} (core plan)</h3>${fields('mowing', pr.mowing)}</div>
+        <div class="card"><h3>${esc(CORE.label)} (core plan)</h3><p class="small muted">Per visit = lawn + bed &amp; shrub upkeep. The year's mulch is added on top, then everything is split into 12 payments.</p>${fields('mowing', pr.mowing)}</div>
         ${ADDONS.map((a) => `<div class="card"><h3><span>${a.icon} ${esc(a.label)}</span><label style="margin:0;display:inline-flex;gap:6px;align-items:center;font:400 .8rem var(--sans)"><input type="checkbox" data-enabled="${a.key}" ${pr.addons[a.key].enabled ? 'checked' : ''}>Offer</label></h3>
           ${a.key === 'lawnTreatment' ? '<p class="warn">Applying fertilizer or weed killer for hire in Tennessee requires a state pest-control charter and a licensed applicator (TN Dept. of Agriculture). Leave this off until you are licensed or have a licensed subcontractor.</p>' : ''}
           ${fields(`addons.${a.key}`, pr.addons[a.key])}</div>`).join('')}

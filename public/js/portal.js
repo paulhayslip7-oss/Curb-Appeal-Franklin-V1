@@ -38,7 +38,7 @@ function planHtml(p) {
       <span class="pill ${p.status}">${esc(STATUS_LABEL[p.status] === 'New lead' ? 'Estimate saved' : STATUS_LABEL[p.status])}</span>
     </div>
     ${price}
-    <p class="small muted" style="margin:6px 0 0">${p.finalMonthly ? '12 equal payments. Same price every month, all year.' : "We'll confirm your fixed monthly price at your free walkthrough."}</p>
+    <p class="small muted" style="margin:6px 0 0">${p.finalMonthly ? '12 equal payments on your annual agreement. Same price every month.' : "We'll confirm your fixed monthly price at your free walkthrough."}</p>
     <ul class="plan-list">${lines.map((l) => `<li><span><strong>${esc(l.label)}</strong><br><span class="cad">${esc(l.cadence)}</span></span>${p.finalMonthly ? '' : `<span class="num muted">${money(l.monthly)}/mo</span>`}</li>`).join('')}</ul>
     ${isClient ? '' : `<p style="margin:14px 0 0"><a class="btn ghost small" href="/?address=${encodeURIComponent(p.address)}">Re-measure or change add-ons</a></p>`}
   </div>`;

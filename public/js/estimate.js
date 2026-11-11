@@ -23,7 +23,7 @@ const measurements = () => ({ ...state.measured, ...state.overrides, edited: Obj
 // ---------- services list on the landing page ----------
 function renderServices() {
   $('#service-grid').innerHTML = [{ ...CORE, icon: '🌿' }, ...ADDONS.filter((a) => state.pricing.addons[a.key]?.enabled)]
-    .map((s) => `<div class="service"><div class="icon" aria-hidden="true">${s.icon}</div><h3>${esc(s.label)}</h3><p>${esc(s.blurb)}</p><p class="small" style="margin-top:6px"><em>${esc(s.cadence)}</em></p></div>`)
+    .map((s, i) => `<div class="service"${i === 0 ? ' style="border-color:var(--green-700);background:#f3f8f2"' : ''}><div class="icon" aria-hidden="true">${s.icon}</div><h3>${esc(s.label)}${s.key === 'mowing' ? ' <span class="pill client">Every plan</span>' : ' <span class="pill">Optional</span>'}</h3><p>${esc(s.blurb)}</p><p class="small" style="margin-top:6px"><em>${esc(s.cadence)}</em></p></div>`)
     .join('');
 }
 
@@ -219,7 +219,8 @@ function renderPlan() {
       <span class="price num">${money(q.core.monthly)}<span class="small muted">/mo</span></span>
     </div>
     <div class="small muted">${esc(CORE.cadence)} · about ${q.core.visitsPerYear} visits a year</div>
-    <ul>${CORE.tasks.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>`;
+    <ul>${CORE.tasks.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>
+    <p class="small" style="margin:10px 0 0"><strong>No separate bills</strong> for weed pulling, shrub trimming, mulch or leaf cleanup — it's all part of every visit.</p>`;
 
   $('#addons').innerHTML = ADDONS.filter((a) => pricing.addons[a.key]?.enabled).map((a) => {
     const on = Boolean(selections.addons[a.key]);

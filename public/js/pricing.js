@@ -9,22 +9,28 @@ export const DEFAULT_PRICING = {
   // The budgetary range shown to prospects: total -low% … total +high%.
   rangeLowPct: 10,
   rangeHighPct: 15,
-  // Core plan: mow, edge, string-trim, blow. Weekly Apr–Oct, every other
-  // week in March and November = ~34 visits, billed as 12 equal payments.
-  mowing: { base: 38, per1kFirst10k: 3.6, per1kAfter10k: 2.4, minPerVisit: 48, visitsPerYear: 34 },
+  // Core plan — all-inclusive grounds care, year round. Every visit covers
+  // the lawn (in season) plus keeping beds weeded, shrubs trimmed, leaves
+  // cleared and mulch topped up, so nothing ever builds into a big job.
+  // Weekly March–November (~39) + every other week December–February (~5)
+  // = ~44 visits, billed as 12 equal payments.
+  //   per visit = lawn (base + per 1,000 sq ft) + upkeep (per shrub + per sq ft of bed)
+  //   per year  = per visit x visits + mulch used for top-ups
+  mowing: {
+    base: 38, per1kFirst10k: 3.6, per1kAfter10k: 2.4, minPerVisit: 48,
+    upkeepPerShrub: 0.75, upkeepPerBedSqft: 0.02, minUpkeepPerVisit: 15,
+    mulchPerCubicYard: 105, mulchInchesPerYear: 1,
+    visitsPerYear: 44,
+  },
   // Bundle discount on add-ons once enough are selected.
   bundle: [
-    { count: 3, pct: 5 },
-    { count: 5, pct: 8 },
-    { count: 7, pct: 10 },
+    { count: 2, pct: 5 },
+    { count: 3, pct: 8 },
+    { count: 4, pct: 10 },
   ],
   addons: {
-    shrubs: { enabled: true, perShrub: 7, minPerVisit: 65, visitsPerYear: 3 },
-    bedWeeding: { enabled: true, base: 30, perBedSqft: 0.06, minPerVisit: 35, visitsPerYear: 9 },
     petWaste: { enabled: true, perVisit: 18, perExtraDog: 4, visitsPerYear: 52 },
     pressureWash: { enabled: true, perSqft: 0.16, minPerVisit: 119, visitsPerYear: 4 },
-    leafCleanup: { enabled: true, mowMultiple: 1.8, minPerVisit: 95, visitsPerYear: 3 },
-    mulch: { enabled: true, perCubicYard: 105, depthInches: 2.5, minPerVisit: 250, visitsPerYear: 1 },
     gutters: { enabled: true, base: 100, perRoofSqft: 0.03, visitsPerYear: 2 },
     aeration: { enabled: true, base: 60, per1k: 14, minPerVisit: 129, visitsPerYear: 1 },
     binCleaning: { enabled: true, perVisit: 15, visitsPerYear: 12 },
@@ -38,19 +44,24 @@ export const DEFAULT_PRICING = {
 // member ticks off on a visit report.
 export const CORE = {
   key: 'mowing',
-  label: 'Lawn care',
-  blurb: 'Mowing, crisp edging along walks and beds, string-trimming, and every hard surface blown clean.',
-  cadence: 'Weekly in the growing season, every other week in spring & late fall',
-  tasks: ['Mow lawn', 'Edge walks, driveway & beds', 'String-trim around obstacles', 'Blow off hard surfaces'],
+  label: 'Year-round grounds care',
+  blurb: 'Lawn, beds, shrubs, weeds, leaves and mulch — all kept up at every visit, so nothing ever turns into a big job.',
+  cadence: 'Weekly March–November, every other week in winter',
+  tasks: [
+    'Mow lawn (in season)',
+    'Edge walks, driveway & beds',
+    'String-trim around obstacles',
+    'Pull weeds in beds & hard surfaces',
+    'Trim & tidy shrubs',
+    'Clear leaves & debris',
+    'Freshen mulch where thin',
+    'Blow off hard surfaces',
+  ],
 };
 
 export const ADDONS = [
-  { key: 'shrubs', label: 'Shrub & hedge trimming', icon: '✂️', blurb: 'Every shrub shaped and the clippings hauled away.', cadence: '3 times a year', tasks: ['Trim & shape shrubs', 'Haul away clippings'] },
-  { key: 'bedWeeding', label: 'Weed removal in beds', icon: '🌱', blurb: 'Hand-pulled weeds in every planting bed and along the hardscape.', cadence: 'Monthly, March–November', tasks: ['Hand-weed planting beds', 'Clear weeds from cracks & edges'] },
   { key: 'petWaste', label: 'Pet waste removal', icon: '🐾', blurb: 'The whole yard scooped, bagged and taken with us.', cadence: 'Every week, all year', tasks: ['Scoop & remove pet waste'], needsDogs: true },
   { key: 'pressureWash', label: 'Pressure washing', icon: '💦', blurb: 'Driveway, walks, patio and steps washed back to bright.', cadence: 'Quarterly', tasks: ['Pressure wash driveway & walks', 'Pressure wash patio & steps'] },
-  { key: 'leafCleanup', label: 'Fall leaf cleanup', icon: '🍂', blurb: 'Leaves cleared from lawn and beds and hauled off.', cadence: '3 visits, November–December', tasks: ['Clear leaves from lawn & beds', 'Haul away leaves'] },
-  { key: 'mulch', label: 'Fresh mulch', icon: '🪵', blurb: 'Beds edged and topped with fresh hardwood mulch.', cadence: 'Once a year, in spring', tasks: ['Edge beds', 'Install fresh mulch'] },
   { key: 'gutters', label: 'Gutter cleaning', icon: '🏠', blurb: 'Gutters and downspouts cleared and flushed.', cadence: 'Twice a year', tasks: ['Clear gutters', 'Flush downspouts'] },
   { key: 'aeration', label: 'Aeration & overseeding', icon: '🌾', blurb: 'Core aeration and overseeding for a thicker lawn next year.', cadence: 'Once a year, in fall', tasks: ['Core-aerate lawn', 'Overseed'] },
   { key: 'binCleaning', label: 'Trash bin cleaning', icon: '🗑️', blurb: 'Bins washed, deodorized and put back.', cadence: 'Monthly', tasks: ['Wash & deodorize trash bins'] },
@@ -86,22 +97,17 @@ export function perVisitPrice(pricing, key, m, selections = {}) {
     const c = pricing.mowing;
     return Math.max(c.minPerVisit, c.base + c.per1kFirst10k * Math.min(lawnK, 10) + c.per1kAfter10k * Math.max(0, lawnK - 10));
   };
-  if (key === 'mowing') return mow();
+  if (key === 'mowing') {
+    const c = pricing.mowing;
+    return mow() + Math.max(c.minUpkeepPerVisit, c.upkeepPerShrub * num(m.shrubCount) + c.upkeepPerBedSqft * num(m.bedSqft));
+  }
   const c = pricing.addons[key];
   if (!c) return 0;
   switch (key) {
-    case 'shrubs':
-      return Math.max(c.minPerVisit, c.perShrub * num(m.shrubCount));
-    case 'bedWeeding':
-      return Math.max(c.minPerVisit, c.base + c.perBedSqft * num(m.bedSqft));
     case 'petWaste':
       return c.perVisit + c.perExtraDog * Math.max(0, Math.round(num(selections.dogs, 1)) - 1);
     case 'pressureWash':
       return Math.max(c.minPerVisit, c.perSqft * num(m.hardscapeSqft));
-    case 'leafCleanup':
-      return Math.max(c.minPerVisit, mow() * c.mowMultiple);
-    case 'mulch':
-      return Math.max(c.minPerVisit, ((num(m.bedSqft) * (c.depthInches / 12)) / 27) * c.perCubicYard);
     case 'gutters':
       return c.base + c.perRoofSqft * num(m.buildingSqft);
     case 'aeration':
@@ -114,10 +120,15 @@ export function perVisitPrice(pricing, key, m, selections = {}) {
   }
 }
 
-/** Monthly cost of one line if it were added (used for the "+$X/mo" labels). */
+/** Yearly cost of the mulch used to keep beds topped up (part of the core plan). */
+export function mulchAnnual(pricing, m) {
+  const c = pricing.mowing;
+  return ((num(m.bedSqft) * (c.mulchInchesPerYear / 12)) / 27) * c.mulchPerCubicYard;
+}
+
+/** Monthly cost of one add-on if it were added (used for the "+$X/mo" labels). */
 export function monthlyFor(pricing, key, m, selections) {
-  const visits = key === 'mowing' ? pricing.mowing.visitsPerYear : pricing.addons[key]?.visitsPerYear || 0;
-  return (perVisitPrice(pricing, key, m, selections) * visits) / 12;
+  return (perVisitPrice(pricing, key, m, selections) * (pricing.addons[key]?.visitsPerYear || 0)) / 12;
 }
 
 const roundTo = (v, step) => Math.round(v / step) * step;
@@ -132,8 +143,9 @@ export function computeQuote(pricing, m, selections = {}) {
   const line = (key, meta) => {
     const perVisit = perVisitPrice(pricing, key, m, selections);
     const visitsPerYear = key === 'mowing' ? pricing.mowing.visitsPerYear : pricing.addons[key].visitsPerYear;
-    const annual = perVisit * visitsPerYear;
-    return { key, label: meta.label, cadence: meta.cadence, perVisit: Math.round(perVisit * 100) / 100, visitsPerYear, annual: Math.round(annual), monthly: Math.round((annual / 12) * 100) / 100 };
+    const materials = key === 'mowing' ? mulchAnnual(pricing, m) : 0;
+    const annual = perVisit * visitsPerYear + materials;
+    return { key, label: meta.label, cadence: meta.cadence, perVisit: Math.round(perVisit * 100) / 100, visitsPerYear, materials: Math.round(materials), annual: Math.round(annual), monthly: Math.round((annual / 12) * 100) / 100 };
   };
   const core = line('mowing', CORE);
   const addons = ADDONS.filter((a) => selections.addons?.[a.key] && pricing.addons[a.key]?.enabled).map((a) => line(a.key, a));

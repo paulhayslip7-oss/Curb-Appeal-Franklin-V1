@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Curb Appeal Franklin — One monthly price for your whole exterior</title>
-  <meta name="description" content="Type your address and see a budgetary monthly price for year-round lawn and exterior care in Franklin, TN — measured from aerial imagery in about a minute.">
+  <title>Curb Appeal Franklin — Year-round grounds care for one monthly price</title>
+  <meta name="description" content="Type your address and see a budgetary monthly price for all-inclusive, year-round grounds care in Franklin, TN — measured from aerial imagery in about a minute.">
   <link rel="stylesheet" href="/vendor/leaflet/leaflet.css">
   <link rel="stylesheet" href="/css/styles.css">
 </head>
@@ -13,6 +13,7 @@
     <div class="container">
       <a class="logo" href="/"><span class="logo-mark" aria-hidden="true">❧</span>Curb Appeal Franklin</a>
       <nav>
+        <a class="hide-sm" href="#why">Why year-round</a>
         <a class="hide-sm" href="#how">How it works</a>
         <a class="hide-sm" href="#dashboard">Your dashboard</a>
         <a class="hide-sm" href="#services">Services</a>
@@ -24,18 +25,18 @@
   <main>
     <div class="hero">
       <div class="container">
-        <div class="eyebrow">Exterior concierge · Franklin, Tennessee</div>
-        <h1>One monthly price.<br>A home that always looks cared for.</h1>
-        <p class="lead">Type your address. We measure your yard from above and build your budgetary monthly price in about a minute — no site visit, no phone tag.</p>
+        <div class="eyebrow">All-inclusive grounds care · Franklin, Tennessee</div>
+        <h1>We stay on top of your yard,<br>so it never gets away from you.</h1>
+        <p class="lead">Lawn, weeds, shrubs, leaves and mulch — handled at every visit, all year, for one fixed monthly price. Type your address and see yours in about a minute.</p>
         <form class="address-form" id="address-form">
           <input id="address" name="address" autocomplete="street-address" placeholder="Your street address, city" aria-label="Your street address" required>
           <button class="btn" type="submit">Measure my yard</button>
         </form>
         <div class="error" id="address-error" role="alert"></div>
         <ul class="hero-points">
-          <li>Same payment every month, all year</li>
-          <li>Lawn, beds, pet waste, pressure washing &amp; more</li>
-          <li>A photo report after every visit</li>
+          <li>Boots on the ground all twelve months</li>
+          <li>No surprise bills for big cleanups</li>
+          <li>A private dashboard for your home</li>
         </ul>
       </div>
     </div>
@@ -69,12 +70,42 @@
           </div>
 
           <div class="plan">
-            <h3><span>Your plan</span></h3>
+            <h3><span>Everything in your plan</span></h3>
             <div class="core-card" id="core-card"></div>
-            <h3 style="margin-top:22px"><span>Add what you'd like handled</span><span class="small muted" id="bundle-hint" style="font:400 .85rem var(--sans)"></span></h3>
+            <h3 style="margin-top:22px"><span>Optional extras</span><span class="small muted" id="bundle-hint" style="font:400 .85rem var(--sans)"></span></h3>
             <div id="addons"></div>
             <div class="summary" id="summary"></div>
             <p class="fine">This is a budgetary range from aerial measurements — not a final quote. Save it and we'll schedule a free walkthrough to confirm your fixed monthly price in person.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="why" class="section-alt">
+      <div class="container">
+        <div class="eyebrow">Why year-round</div>
+        <h2>Big cleanup jobs only exist because nobody was keeping up.</h2>
+        <p class="muted" style="max-width:720px">A weekend of weed pulling. A truckload of leaves. Shrubs that need cutting back by half. Those jobs are what happens when a yard is left alone for months. We're at your home all year, so the small things get handled while they're still small.</p>
+        <div class="versus">
+          <div class="vs old">
+            <h3>The usual way</h3>
+            <ul>
+              <li>A mowing crew that only mows</li>
+              <li>Weeds take over the beds by July</li>
+              <li>A separate quote every time something needs doing</li>
+              <li>One huge leaf removal bill in December</li>
+              <li>No idea what was done, or whether anyone came</li>
+            </ul>
+          </div>
+          <div class="vs new">
+            <h3>The Curb Appeal way</h3>
+            <ul>
+              <li>One crew that looks after the whole property</li>
+              <li>Weeds pulled at every visit, before they spread</li>
+              <li>Shrubs kept in shape, mulch topped up, leaves cleared as they fall</li>
+              <li>One fixed monthly price on an annual agreement</li>
+              <li>A report with photos after every visit, on your own dashboard</li>
+            </ul>
           </div>
         </div>
       </div>
@@ -86,16 +117,16 @@
         <h2>From address to a number you can plan around</h2>
         <div class="steps">
           <div class="step"><h3>We map your property</h3><p class="muted">Enter your address and we pull an aerial view, outline your lot, and measure the lawn, plantings and hard surfaces.</p></div>
-          <div class="step"><h3>You build your plan</h3><p class="muted">Start with weekly lawn care, then tick the extras you'd rather never think about again. The monthly price updates as you go.</p></div>
-          <div class="step"><h3>We confirm in person</h3><p class="muted">Save your estimate and we'll walk the property with you, confirm the details, and lock in one fixed monthly price for the year.</p></div>
+          <div class="step"><h3>You build your plan</h3><p class="muted">Your plan already covers the lawn, weeds, shrubs, leaves and mulch. Add extras like pet waste removal or pressure washing if you want them — the monthly price updates as you go.</p></div>
+          <div class="step"><h3>We confirm in person</h3><p class="muted">Save your estimate and we'll walk the property with you, confirm the details, and lock in one fixed monthly price on an annual agreement.</p></div>
         </div>
       </div>
     </section>
 
-    <section id="dashboard" class="section-alt">
+    <section id="dashboard">
       <div class="container split">
         <div>
-          <div class="eyebrow">Your client dashboard</div>
+          <div class="eyebrow">A dashboard dedicated to your home</div>
           <h2>You'll never wonder what we did — or whether we came.</h2>
           <p class="muted">Most service companies leave you guessing. Every Curb Appeal client gets a private dashboard that shows exactly what the job is and exactly what was done.</p>
           <ul class="ticks">
@@ -109,8 +140,8 @@
           <span class="sample-tag">SAMPLE</span>
           <div class="visit-head"><h3>Thursday, June 12</h3><span class="visit-meta">48 min on site · Crew: Paul</span></div>
           <ul class="checks">
-            <li>Mow lawn</li><li>Edge walks, driveway &amp; beds</li><li>String-trim around obstacles</li><li>Blow off hard surfaces</li><li>Scoop &amp; remove pet waste</li>
-            <li class="skip">Hand-weed planting beds<span class="why">Beds too wet after rain — first thing next visit</span></li>
+            <li>Mow lawn</li><li>Edge walks, driveway &amp; beds</li><li>Pull weeds in beds &amp; hard surfaces</li><li>Trim &amp; tidy shrubs</li><li>Clear leaves &amp; debris</li><li>Blow off hard surfaces</li>
+            <li class="skip">Freshen mulch where thin<span class="why">Beds too wet after rain — first thing next visit</span></li>
           </ul>
           <div class="note">Sprinkler head by the mailbox is leaking — flagged it with a marker so it's easy to find.</div>
           <div class="photos">
@@ -122,10 +153,10 @@
       </div>
     </section>
 
-    <section id="services">
+    <section id="services" class="section-alt">
       <div class="container">
-        <div class="eyebrow">What we take off your plate</div>
-        <h2>Everything outside, bundled into one fixed payment</h2>
+        <div class="eyebrow">What's included, and what you can add</div>
+        <h2>One plan covers the grounds. Extras cover the rest.</h2>
         <div class="service-grid" id="service-grid"></div>
         <p style="margin-top:28px"><a class="btn" href="#address">Get my monthly price</a></p>
       </div>
