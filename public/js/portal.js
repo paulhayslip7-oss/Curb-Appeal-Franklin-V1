@@ -111,14 +111,14 @@ async function showProperty(id) {
   let next = '';
   if (p.nextVisit) {
     next = `<div class="card" style="background:var(--green-900);color:#fff;border:0">
-      <div class="small" style="color:#e3c377;font-weight:600;letter-spacing:.08em;text-transform:uppercase">${isClient ? 'Next visit' : 'Your walkthrough'}</div>
-      <div style="font:600 1.5rem var(--serif)">${esc(fmtDate(p.nextVisit.date))}</div>
-      ${p.nextVisit.note ? `<div class="small" style="color:#c5d8c7">${esc(p.nextVisit.note)}</div>` : ''}
+      <div style="color:#f0b48f;font:500 .74rem var(--mono);letter-spacing:.06em;text-transform:uppercase">${isClient ? 'Next visit' : 'Your walkthrough'}</div>
+      <div style="font:800 1.9rem/1.15 var(--serif);letter-spacing:-.03em;margin:4px 0">${esc(fmtDate(p.nextVisit.date))}</div>
+      ${p.nextVisit.note ? `<div class="small" style="color:#c9d6c9">${esc(p.nextVisit.note)}</div>` : ''}
     </div>`;
   } else if (!isClient) {
     next = `<div class="card" style="background:var(--green-900);color:#fff;border:0">
-      <div style="font:600 1.3rem var(--serif)">Next step: your free walkthrough</div>
-      <div class="small" style="color:#c5d8c7">We'll call or text within one business day to find a time. We walk the property together and confirm your fixed monthly price. Prefer to reach us? <a href="tel:+16159451614" style="color:#fff">(615) 945-1614</a></div>
+      <div style="font:800 1.5rem/1.15 var(--serif);letter-spacing:-.03em;margin-bottom:6px">Next step: your free walkthrough</div>
+      <div class="small" style="color:#c9d6c9">We'll call or text within one business day to find a time. We walk the property together and confirm your fixed monthly price. Prefer to reach us? <a href="tel:+16159451614" style="color:#fff">(615) 945-1614</a></div>
     </div>`;
   }
 

@@ -183,7 +183,7 @@ function pricingHtml() {
     <form id="pricing-form">
       <div class="pricing-grid">
         <div class="card"><h3>${esc(CORE.label)} (core plan)</h3><p class="small muted">Per visit = lawn + bed &amp; shrub upkeep. The year's mulch is added on top, then everything is split into 12 payments.</p>${fields('mowing', pr.mowing)}</div>
-        ${ADDONS.map((a) => `<div class="card"><h3><span>${a.icon} ${esc(a.label)}</span><label style="margin:0;display:inline-flex;gap:6px;align-items:center;font:400 .8rem var(--sans)"><input type="checkbox" data-enabled="${a.key}" ${pr.addons[a.key].enabled ? 'checked' : ''}>Offer</label></h3>
+        ${ADDONS.map((a) => `<div class="card"><h3><span>${esc(a.label)}</span><label style="margin:0;display:inline-flex;gap:6px;align-items:center;font:400 .8rem var(--sans)"><input type="checkbox" data-enabled="${a.key}" ${pr.addons[a.key].enabled ? 'checked' : ''}>Offer</label></h3>
           ${a.key === 'lawnTreatment' ? '<p class="warn">Applying fertilizer or weed killer for hire in Tennessee requires a state pest-control charter and a licensed applicator (TN Dept. of Agriculture). Leave this off until you are licensed or have a licensed subcontractor.</p>' : ''}
           ${fields(`addons.${a.key}`, pr.addons[a.key])}</div>`).join('')}
         <div class="card"><h3>Crew cost assumptions</h3><p class="small muted">Private — used only for the "Does this job pay?" check on each property. Healthy maintenance companies bring in about $75–95 per crew hour and keep crew cost near a third of revenue.</p>${fields('labor', pr.labor)}</div>

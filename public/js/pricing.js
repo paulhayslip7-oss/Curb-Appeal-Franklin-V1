@@ -72,12 +72,12 @@ export const CORE = {
 };
 
 export const ADDONS = [
-  { key: 'petWaste', label: 'Pet waste removal', icon: '🐾', blurb: 'The whole yard scooped, bagged and taken with us.', cadence: 'Every week, all year', tasks: ['Scoop & remove pet waste'], needsDogs: true },
-  { key: 'pressureWash', label: 'Pressure washing', icon: '💦', blurb: 'Driveway, walks, patio and steps washed back to bright.', cadence: 'Quarterly', tasks: ['Pressure wash driveway & walks', 'Pressure wash patio & steps'] },
-  { key: 'gutters', label: 'Gutter cleaning', icon: '🏠', blurb: 'Gutters and downspouts cleared and flushed.', cadence: 'Twice a year', tasks: ['Clear gutters', 'Flush downspouts'] },
-  { key: 'aeration', label: 'Aeration & overseeding', icon: '🌾', blurb: 'Core aeration and overseeding for a thicker lawn next year.', cadence: 'Once a year, in fall', tasks: ['Core-aerate lawn', 'Overseed'] },
-  { key: 'binCleaning', label: 'Trash bin cleaning', icon: '🗑️', blurb: 'Bins washed, deodorized and put back.', cadence: 'Monthly', tasks: ['Wash & deodorize trash bins'] },
-  { key: 'lawnTreatment', label: 'Lawn fertilization & weed control', icon: '🧪', blurb: 'Seasonal fertilizer and weed control applications.', cadence: '7 rounds a year', tasks: ['Apply seasonal lawn treatment'] },
+  { key: 'petWaste', label: 'Pet waste removal', blurb: 'The whole yard scooped, bagged and taken with us.', cadence: 'Every week, all year', tasks: ['Scoop & remove pet waste'], needsDogs: true },
+  { key: 'pressureWash', label: 'Pressure washing', blurb: 'Driveway, walks, patio and steps washed back to bright.', cadence: 'Quarterly', tasks: ['Pressure wash driveway & walks', 'Pressure wash patio & steps'] },
+  { key: 'gutters', label: 'Gutter cleaning', blurb: 'Gutters and downspouts cleared and flushed.', cadence: 'Twice a year', tasks: ['Clear gutters', 'Flush downspouts'] },
+  { key: 'aeration', label: 'Aeration & overseeding', blurb: 'Core aeration and overseeding for a thicker lawn next year.', cadence: 'Once a year, in fall', tasks: ['Core-aerate lawn', 'Overseed'] },
+  { key: 'binCleaning', label: 'Trash bin cleaning', blurb: 'Bins washed, deodorized and put back.', cadence: 'Monthly', tasks: ['Wash & deodorize trash bins'] },
+  { key: 'lawnTreatment', label: 'Lawn fertilization & weed control', blurb: 'Seasonal fertilizer and weed control applications.', cadence: '7 rounds a year', tasks: ['Apply seasonal lawn treatment'] },
 ];
 
 const num = (v, fallback = 0) => (Number.isFinite(Number(v)) ? Number(v) : fallback);

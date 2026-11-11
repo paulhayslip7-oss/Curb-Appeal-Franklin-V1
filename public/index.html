@@ -11,7 +11,7 @@
 <body>
   <header class="site-header">
     <div class="container">
-      <a class="logo" href="/"><span class="logo-mark" aria-hidden="true">❧</span>Curb Appeal Franklin</a>
+      <a class="logo" href="/"><span class="logo-mark" aria-hidden="true"></span>Curb Appeal Franklin</a>
       <nav>
         <a class="hide-sm" href="#why">Why year-round</a>
         <a class="hide-sm" href="#how">How it works</a>
@@ -25,8 +25,9 @@
   <main>
     <div class="hero">
       <div class="container">
+        <div>
         <div class="eyebrow">All-inclusive grounds care · Franklin, Tennessee</div>
-        <h1>We stay on top of your yard,<br>so it never gets away from you.</h1>
+        <h1>We stay on top of your yard, so it never <em>gets away</em> from you.</h1>
         <p class="lead">Lawn, weeds, shrubs, leaves and mulch — handled at every visit, all year, for one fixed monthly price. Type your address and see yours in about a minute.</p>
         <form class="address-form" id="address-form">
           <input id="address" name="address" autocomplete="off" placeholder="Start typing your street address" aria-label="Your street address" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="address-suggestions" required>
@@ -39,6 +40,45 @@
           <li>No surprise bills for big cleanups</li>
           <li>A private dashboard for your home</li>
         </ul>
+        </div>
+        <div class="plat" aria-hidden="true">
+          <svg viewBox="0 0 420 380" xmlns="http://www.w3.org/2000/svg" font-family="'Plex Mono', ui-monospace, monospace" font-size="9" fill="#16211a">
+            <defs>
+              <pattern id="turf" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><rect width="6" height="6" fill="#dfe8d8"/><line x1="0" y1="0" x2="0" y2="6" stroke="#9db894" stroke-width="1.4"/></pattern>
+              <pattern id="pave" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#e8e1d0"/><path d="M0 8L8 0" stroke="#bdb39b" stroke-width=".8"/></pattern>
+            </defs>
+            <rect x="1" y="1" width="418" height="378" fill="none" stroke="#16211a" stroke-width="1.5"/>
+            <text x="14" y="22" letter-spacing="1">SHEET 01 — YOUR PROPERTY, MEASURED</text>
+            <line x1="14" y1="30" x2="406" y2="30" stroke="#16211a" stroke-width=".8"/>
+            <!-- street -->
+            <rect x="14" y="300" width="392" height="26" fill="#d9d2c0"/>
+            <line x1="14" y1="313" x2="406" y2="313" stroke="#fff" stroke-width="1.2" stroke-dasharray="10 8"/>
+            <!-- lot -->
+            <polygon points="70,62 350,54 356,296 64,296" fill="url(#turf)" stroke="#16211a" stroke-width="1.6" stroke-dasharray="7 4"/>
+            <!-- drive + walk -->
+            <polygon points="262,198 306,198 310,296 258,296" fill="url(#pave)" stroke="#16211a" stroke-width=".8"/>
+            <rect x="186" y="212" width="12" height="84" fill="url(#pave)" stroke="#16211a" stroke-width=".8"/>
+            <!-- house -->
+            <polygon points="140,118 312,118 312,198 232,198 232,212 140,212" fill="#16211a"/>
+            <line x1="140" y1="165" x2="312" y2="165" stroke="#f4f0e6" stroke-width=".8" opacity=".5"/>
+            <!-- shrubs -->
+            <g fill="#1f4d2e">
+              <circle cx="128" cy="222" r="6"/><circle cx="146" cy="224" r="6"/><circle cx="164" cy="224" r="6"/><circle cx="212" cy="224" r="6"/><circle cx="228" cy="224" r="6"/>
+              <circle cx="92" cy="84" r="9"/><circle cx="112" cy="80" r="7"/><circle cx="326" cy="80" r="9"/><circle cx="330" cy="104" r="7"/><circle cx="88" cy="150" r="7"/><circle cx="88" cy="170" r="7"/>
+            </g>
+            <!-- corner pins -->
+            <g fill="#f4f0e6" stroke="#b8502a" stroke-width="2.4"><rect x="65" y="57" width="10" height="10"/><rect x="345" y="49" width="10" height="10"/><rect x="351" y="291" width="10" height="10"/><rect x="59" y="291" width="10" height="10"/></g>
+            <!-- callouts -->
+            <g stroke="#b8502a" stroke-width="1" fill="none"><path d="M104 262H40V346"/><path d="M284 250H384V346"/><path d="M92 84H30"/></g>
+            <g fill="#b8502a"><circle cx="104" cy="262" r="2.5"/><circle cx="284" cy="250" r="2.5"/><circle cx="92" cy="84" r="2.5"/></g>
+            <text x="14" y="78" fill="#b8502a">SHRUBS</text><text x="14" y="90" font-weight="500" font-size="11">× 27</text>
+            <text x="14" y="358" fill="#b8502a">LAWN</text><text x="14" y="371" font-weight="500" font-size="11">9,510 SQ FT</text>
+            <text x="300" y="358" fill="#b8502a">HARD SURFACE</text><text x="300" y="371" font-weight="500" font-size="11">1,240 SQ FT</text>
+            <text x="160" y="358" fill="#b8502a">LOT</text><text x="160" y="371" font-weight="500" font-size="11">0.27 ACRE</text>
+            <!-- north -->
+            <g transform="translate(388 52)" stroke="#16211a" stroke-width="1.2" fill="none"><path d="M0 14V-8M-5 -2L0 -9L5 -2"/></g><text x="384" y="76">N</text>
+          </svg>
+        </div>
       </div>
     </div>
 
@@ -139,16 +179,16 @@
         </div>
         <div class="visit sample" aria-label="Sample visit report">
           <span class="sample-tag">SAMPLE</span>
-          <div class="visit-head"><h3>Thursday, June 12</h3><span class="visit-meta">48 min on site · Crew: Paul</span></div>
+          <div class="visit-head"><h3>Thursday, June 12</h3><span class="visit-meta">48 min on site · Crew: Paul · 6 of 7 tasks</span></div>
           <ul class="checks">
             <li>Mow lawn</li><li>Edge walks, driveway &amp; beds</li><li>Pull weeds in beds &amp; hard surfaces</li><li>Trim &amp; tidy shrubs</li><li>Clear leaves &amp; debris</li><li>Blow off hard surfaces</li>
             <li class="skip">Freshen mulch where thin<span class="why">Beds too wet after rain — first thing next visit</span></li>
           </ul>
           <div class="note">Sprinkler head by the mailbox is leaking — flagged it with a marker so it's easy to find.</div>
           <div class="photos">
-            <figure><div class="swatch" style="background:linear-gradient(135deg,#7a8b5a,#b5b08a)">🌿</div><figcaption>Before</figcaption></figure>
-            <figure><div class="swatch" style="background:linear-gradient(135deg,#2f7d3c,#7fc46b)">🌿</div><figcaption>After</figcaption></figure>
-            <figure><div class="swatch" style="background:linear-gradient(135deg,#3a8a46,#a4d68a)">🏡</div><figcaption>After</figcaption></figure>
+            <figure><div class="swatch"></div><figcaption>Before</figcaption></figure>
+            <figure><div class="swatch after"></div><figcaption>After</figcaption></figure>
+            <figure><div class="swatch after"></div><figcaption>After</figcaption></figure>
           </div>
         </div>
       </div>
@@ -159,7 +199,7 @@
         <div class="eyebrow">What's included, and what you can add</div>
         <h2>One plan covers the grounds. Extras cover the rest.</h2>
         <div class="service-grid" id="service-grid"></div>
-        <p style="margin-top:28px"><a class="btn" href="#address">Get my monthly price</a></p>
+        <p style="margin-top:32px"><a class="btn" href="#address">Get my monthly price</a></p>
       </div>
     </section>
   </main>

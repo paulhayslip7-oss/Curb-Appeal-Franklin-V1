@@ -22,8 +22,8 @@ const measurements = () => ({ ...state.measured, ...state.overrides, edited: Obj
 
 // ---------- services list on the landing page ----------
 function renderServices() {
-  $('#service-grid').innerHTML = [{ ...CORE, icon: '🌿' }, ...ADDONS.filter((a) => state.pricing.addons[a.key]?.enabled)]
-    .map((s, i) => `<div class="service"${i === 0 ? ' style="border-color:var(--green-700);background:#f3f8f2"' : ''}><div class="icon" aria-hidden="true">${s.icon}</div><h3>${esc(s.label)}${s.key === 'mowing' ? ' <span class="pill client">Every plan</span>' : ' <span class="pill">Optional</span>'}</h3><p>${esc(s.blurb)}</p><p class="small" style="margin-top:6px"><em>${esc(s.cadence)}</em></p></div>`)
+  $('#service-grid').innerHTML = [CORE, ...ADDONS.filter((a) => state.pricing.addons[a.key]?.enabled)]
+    .map((s) => `<div class="service"><h3>${esc(s.label)}${s.key === 'mowing' ? ' <span class="pill client">Every plan</span>' : ' <span class="pill">Optional</span>'}</h3><p>${esc(s.blurb)}</p><p class="cad">${esc(s.cadence)}</p></div>`)
     .join('');
 }
 
@@ -270,7 +270,7 @@ function renderPlan() {
 
   $('#core-card').innerHTML = `
     <div style="display:flex;justify-content:space-between;gap:12px;align-items:baseline">
-      <strong>🌿 ${esc(CORE.label)} <span class="pill client" style="margin-left:6px">Included</span></strong>
+      <strong style="font:700 1.25rem var(--serif);letter-spacing:-.02em">${esc(CORE.label)}</strong>
       <span class="price num">${money(q.core.monthly)}<span class="small muted">/mo</span></span>
     </div>
     <div class="small muted">${esc(CORE.cadence)} · about ${q.core.visitsPerYear} visits a year</div>
@@ -284,7 +284,7 @@ function renderPlan() {
       : '';
     return `<label class="addon ${on ? 'on' : ''}">
       <input type="checkbox" data-addon="${a.key}" ${on ? 'checked' : ''}>
-      <span class="body"><span class="name">${a.icon} ${esc(a.label)}</span><br><span class="desc">${esc(a.blurb)} <em>${esc(a.cadence)}.</em></span>${dogs}</span>
+      <span class="body"><span class="name">${esc(a.label)}</span><br><span class="desc">${esc(a.blurb)} <em>${esc(a.cadence)}.</em></span>${dogs}</span>
       <span class="plus num">+${money(monthlyFor(pricing, a.key, m, selections))}/mo</span>
     </label>`;
   }).join('');
