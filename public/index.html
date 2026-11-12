@@ -29,7 +29,7 @@
           <h1>Your home's exterior, <em>always</em> cared for.</h1>
           <p class="lead">Year-round exterior care for Franklin's finest homes. One agreement, one monthly price.</p>
           <div class="hero-cta">
-            <button class="btn light" type="button" data-start>Get started</button>
+            <a class="btn light" href="/get-started.html" data-start>Get started</a>
           </div>
         </div>
         <div class="plat" aria-hidden="true">
@@ -101,8 +101,15 @@
       <div class="container">
         <div class="eyebrow">Services</div>
         <h2>One plan. Four optional extras.</h2>
-        <div class="service-grid" id="service-grid"></div>
-        <p style="margin-top:32px"><button class="btn" type="button" data-start>Get started</button></p>
+        <div class="service-grid" id="service-grid">
+          <div class="service core"><h3>Year-Round Exterior Care <span class="pill client">Every plan</span></h3><p>Lawn, beds, shrubs, weeds, leaves and mulch at every visit. Hard surfaces blown off and the front entry wiped down. Outdoor faucets winterized each fall.</p><p class="cad">Every week, every other week in winter</p></div>
+          <div class="service-sub">Optional extras</div>
+          <div class="service"><h3>Pet Waste Removal</h3><p>The whole yard scooped and hauled away.</p><p class="cad">Every week</p></div>
+          <div class="service"><h3>Pressure Washing</h3><p>Walks, patios, steps and hardscaping.</p><p class="cad">Every quarter</p></div>
+          <div class="service"><h3>Aeration &amp; Overseeding</h3><p>For a thicker lawn next year.</p><p class="cad">Once a year</p></div>
+          <div class="service"><h3>Porch &amp; Patio Detailing</h3><p>Swept, cobwebs cleared and furniture wiped down.</p><p class="cad">Every month</p></div>
+        </div>
+        <p style="margin-top:32px"><a class="btn" href="/get-started.html" data-start>Get started</a></p>
       </div>
     </section>
 
@@ -180,10 +187,6 @@
     </section>
   </main>
 
-  <!-- Netlify Forms reads this at deploy time; the real form is the pop-up in home.js. -->
-  <form name="inquiry" data-netlify="true" netlify-honeypot="company" hidden>
-    <input name="first_name"><input name="last_name"><input name="phone"><input name="email"><input name="address"><textarea name="services"></textarea><input name="company">
-  </form>
 
   <footer class="site-footer">
     <div class="container">

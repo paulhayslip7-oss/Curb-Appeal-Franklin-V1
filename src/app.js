@@ -81,7 +81,20 @@ export function createApp(store, env = {}) {
       }
       return saved.value;
     })());
-  const getPricing = async () => mergePricing(await store.get('config/pricing'));
+  // Pricing changes rarely, so keep it for a minute, and if storage is
+  // unreachable fall back to the last known (or built-in) prices rather than
+  // failing the page.
+  let pricingCache = { at: 0, value: null };
+  const getPricing = async () => {
+    if (pricingCache.value && Date.now() - pricingCache.at < 60_000) return structuredClone(pricingCache.value);
+    try {
+      pricingCache = { at: Date.now(), value: mergePricing(await store.get('config/pricing')) };
+    } catch (err) {
+      console.error('pricing read failed', err);
+      if (!pricingCache.value) return mergePricing(null);
+    }
+    return structuredClone(pricingCache.value);
+  };
 
   async function session(req) {
     const m = (req.headers.get('cookie') || '').match(new RegExp(`(?:^|;\\s*)${COOKIE}=([^;]+)`));
@@ -137,7 +150,7 @@ export function createApp(store, env = {}) {
     // Pricing for the estimator. The owner's cost assumptions stay private.
     ['GET', '/api/config', async (req) => {
       const { labor, ...pricing } = await getPricing();
-      const reviews = (await store.get('config/reviews'))?.reviews || [];
+      const reviews = (await store.get('config/reviews').catch((err) => (console.error('reviews read failed', err), null)))?.reviews || [];
       return json({ pricing: (await session(req))?.role === 'admin' ? { ...pricing, labor } : pricing, reviews });
     }],
 
@@ -556,6 +569,7 @@ export function createApp(store, env = {}) {
       const b = await body(req);
       const pricing = b.reset ? structuredClone(DEFAULT_PRICING) : mergePricing(b.pricing);
       await store.set('config/pricing', pricing);
+      pricingCache = { at: Date.now(), value: pricing };
       return json({ pricing });
     }],
   ].map(([method, pattern, fn]) => {

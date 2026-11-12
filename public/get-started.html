@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0e2216">
+  <title>Get started — Curb Appeal Franklin</title>
+  <meta name="description" content="Year-round exterior care for Franklin's finest homes. One agreement, one monthly price.">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="logo" href="/" aria-label="Curb Appeal Franklin"><span class="logo-script">Curb Appeal</span><span class="logo-sub">Franklin</span></a>
+      <nav>
+        <a class="hide-sm" href="/">Home</a>
+        <a class="hide-sm" href="sms:+16159451614">Text (615) 945-1614</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- A plain HTML form: it works with no JavaScript at all. Netlify Forms
+       receives it and emails the owner. The home page opens the same form
+       in a pop-up when scripts are available. -->
+  <main class="container dash" style="max-width:760px">
+    <div class="eyebrow">Get started</div>
+    <h1 style="font-size:clamp(2.2rem,5vw,3.2rem)">Let's get started.</h1>
+    <p class="muted">Tell us where the property is and what you'd like handled. Paul will be in touch.</p>
+    <form name="inquiry" method="POST" action="/thanks.html" data-netlify="true" netlify-honeypot="company" style="margin-top:24px">
+      <input type="hidden" name="form-name" value="inquiry">
+      <div class="row">
+        <div class="field"><label for="gs-first">First name</label><input id="gs-first" name="first_name" autocomplete="given-name" required></div>
+        <div class="field"><label for="gs-last">Last name</label><input id="gs-last" name="last_name" autocomplete="family-name" required></div>
+      </div>
+      <div class="row">
+        <div class="field"><label for="gs-phone">Phone number</label><input id="gs-phone" name="phone" type="tel" autocomplete="tel" required></div>
+        <div class="field"><label for="gs-email">Email</label><input id="gs-email" name="email" type="email" autocomplete="email" required></div>
+      </div>
+      <div class="field"><label for="gs-address">Address for service</label><input id="gs-address" name="address" autocomplete="street-address" required></div>
+      <fieldset class="pick">
+        <legend>Services you might bundle together</legend>
+            <label><input type="checkbox" name="services" value="Year-Round Exterior Care"><span>Year-Round Exterior Care</span></label>
+            <label><input type="checkbox" name="services" value="Pet Waste Removal"><span>Pet Waste Removal</span></label>
+            <label><input type="checkbox" name="services" value="Pressure Washing"><span>Pressure Washing</span></label>
+            <label><input type="checkbox" name="services" value="Aeration &amp; Overseeding"><span>Aeration &amp; Overseeding</span></label>
+            <label><input type="checkbox" name="services" value="Porch &amp; Patio Detailing"><span>Porch &amp; Patio Detailing</span></label>
+      </fieldset>
+      <p hidden><label>Leave this empty <input name="company" tabindex="-1" autocomplete="off"></label></p>
+      <button class="btn block" type="submit">Send</button>
+      <p class="small muted" style="margin-top:14px;text-align:center">Prefer to text? <a href="sms:+16159451614">(615) 945-1614</a></p>
+    </form>
+  </main>
+</body>
+</html>

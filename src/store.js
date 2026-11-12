@@ -46,21 +46,35 @@ export function fileStore(dir) {
   };
 }
 
+// Blob storage occasionally fails a single request. Try up to three times.
+async function retry(fn) {
+  let lastError;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      lastError = err;
+      await new Promise((r) => setTimeout(r, 120 * (attempt + 1)));
+    }
+  }
+  throw lastError;
+}
+
 export async function netlifyStore() {
   const { getStore } = await import('@netlify/blobs');
   const store = getStore({ name: 'curb-appeal', consistency: 'strong' });
   return {
-    get: (key) => store.get(safeKey(key), { type: 'json' }),
-    set: (key, value) => store.setJSON(safeKey(key), value),
-    delete: (key) => store.delete(safeKey(key)),
+    get: (key) => retry(() => store.get(safeKey(key), { type: 'json' })),
+    set: (key, value) => retry(() => store.setJSON(safeKey(key), value)),
+    delete: (key) => retry(() => store.delete(safeKey(key))),
     async list(prefix) {
-      const { blobs } = await store.list({ prefix: safeKey(prefix) });
+      const { blobs } = await retry(() => store.list({ prefix: safeKey(prefix) }));
       return blobs.map((b) => b.key);
     },
     async getBlob(key) {
-      const res = await store.getWithMetadata(`bin/${safeKey(key)}`, { type: 'arrayBuffer' });
+      const res = await retry(() => store.getWithMetadata(`bin/${safeKey(key)}`, { type: 'arrayBuffer' }));
       return res ? { data: new Uint8Array(res.data), type: res.metadata?.type || 'application/octet-stream' } : null;
     },
-    setBlob: (key, data, type) => store.set(`bin/${safeKey(key)}`, data, { metadata: { type } }),
+    setBlob: (key, data, type) => retry(() => store.set(`bin/${safeKey(key)}`, data, { metadata: { type } })),
   };
 }

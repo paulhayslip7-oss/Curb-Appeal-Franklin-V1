@@ -1,9 +1,11 @@
 // The home page: services list, reviews, and the "Get started" form.
 
 import { $, api, esc, initHeader } from './common.js';
-import { ADDONS, CORE } from './pricing.js';
+import { ADDONS, CORE, DEFAULT_PRICING } from './pricing.js';
 
-const state = { pricing: null };
+// Start from the built-in service list so the page works even if the
+// data service is slow or down; the live settings replace it when they load.
+const state = { pricing: DEFAULT_PRICING };
 
 function renderServices() {
   const extras = ADDONS.filter((a) => state.pricing.addons[a.key]?.enabled);
@@ -56,15 +58,30 @@ function inquiryModal() {
     const btn = $('button[type=submit]', back);
     btn.disabled = true;
     $('.error', back).textContent = '';
+    // Two independent routes, so a lead is never lost to one of them failing:
+    // the admin pipeline, and Netlify Forms (which emails the owner).
+    const problem =
+      [['firstName', 'your first name'], ['lastName', 'your last name'], ['phone', 'a phone number'], ['email', 'an email address'], ['address', 'the address for service']]
+        .filter(([k]) => !String(f[k] || '').trim()).map(([, label]) => `Please enter ${label}.`)[0]
+      || (String(f.phone).replace(/\D/g, '').length < 7 && 'Please enter a full phone number.')
+      || (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(f.email).trim()) && 'Please enter a valid email address.');
+    if (problem) {
+      $('.error', back).textContent = problem;
+      btn.disabled = false;
+      return;
+    }
     try {
-      await api('POST', '/api/inquiries', { firstName: f.firstName, lastName: f.lastName, phone: f.phone, email: f.email, address: f.address, services: picked });
-      // Netlify Forms emails the owner. Best effort: the inquiry is already saved for the admin page.
       const labels = services.filter((s) => picked.includes(s.key)).map((s) => s.label);
-      fetch('/', {
+      const saved = api('POST', '/api/inquiries', { firstName: f.firstName, lastName: f.lastName, phone: f.phone, email: f.email, address: f.address, services: picked });
+      const emailed = fetch('/', {
         method: 'POST',
         headers: { 'content-type': 'application/x-www-form-urlencoded' },
         body: new URLSearchParams({ 'form-name': 'inquiry', first_name: f.firstName, last_name: f.lastName, phone: f.phone, email: f.email, address: f.address, services: labels.join(', ') || 'None selected' }),
-      }).catch(() => {});
+      }).then((r) => { if (!r.ok) throw new Error('email route failed'); });
+      const [a, b] = await Promise.allSettled([saved, emailed]);
+      // A validation message from the server (bad email, etc.) is shown as is.
+      if (a.status === 'rejected' && a.reason?.status === 400) throw a.reason;
+      if (a.status === 'rejected' && b.status === 'rejected') throw new Error('We couldn\'t send that just now. Please text (615) 945-1614.');
       $('.modal', back).innerHTML = `
         <button class="close" aria-label="Close">×</button>
         <h2 style="font-size:2.1rem">Thank you, ${esc(f.firstName)}.</h2>
@@ -78,14 +95,35 @@ function inquiryModal() {
   document.body.append(back);
   $('#in-first', back).focus();
 }
-document.addEventListener('click', (e) => { if (e.target.closest('[data-start]')) inquiryModal(); });
+// The buttons are real links to /get-started.html, so they still work if
+// this script never loads. When it does load, open the form in place instead.
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('[data-start]')) return;
+  try {
+    inquiryModal();
+    e.preventDefault();
+  } catch (err) {
+    console.error(err); // fall through to the plain page
+  }
+});
 
 
 // ---------- start ----------
-const [{ pricing, reviews }] = await Promise.all([api('GET', '/api/config'), initHeader()]);
-state.pricing = pricing;
-renderServices();
-if (reviews?.length) {
-  $('#review-grid').innerHTML = reviews.map((r) => `<figure class="review"><div class="stars" role="img" aria-label="${r.stars} out of 5 stars">${'★'.repeat(r.stars)}</div><blockquote>${esc(r.text)}</blockquote><figcaption><strong>${esc(r.name)}</strong>${r.source ? ` · ${esc(r.source)}` : ''}</figcaption></figure>`).join('');
-  $('#reviews').hidden = false;
-}
+// The services are already in the page's HTML. Everything below is an
+// optional refresh from live settings; any failure leaves the page as it is.
+(async () => {
+  initHeader().catch(() => {});
+  try {
+    const { pricing, reviews } = await api('GET', '/api/config');
+    if (pricing?.addons) {
+      state.pricing = pricing;
+      renderServices();
+    }
+    if (reviews?.length) {
+      $('#review-grid').innerHTML = reviews.map((r) => `<figure class="review"><div class="stars" role="img" aria-label="${r.stars} out of 5 stars">${'★'.repeat(r.stars)}</div><blockquote>${esc(r.text)}</blockquote><figcaption><strong>${esc(r.name)}</strong>${r.source ? ` · ${esc(r.source)}` : ''}</figcaption></figure>`).join('');
+      $('#reviews').hidden = false;
+    }
+  } catch {
+    // Keep what the page already shows.
+  }
+})();
