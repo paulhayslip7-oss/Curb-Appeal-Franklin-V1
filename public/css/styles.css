@@ -380,3 +380,18 @@ details summary { cursor: pointer; min-height: 30px; }
 
 .hero h1 { max-width: 13ch; }
 @media (max-width: 900px) { .hero h1 { max-width: none; } }
+
+/* About: a tall portrait beside the story, a wide photo beneath it */
+.about-photo img { aspect-ratio: 2 / 3; object-position: 50% 35%; }
+.about-photo.second { margin: 32px 0 0; position: static; }
+.about-photo.second img { aspect-ratio: 3 / 2; object-position: 50% 40%; }
+@media (min-width: 861px) { .about-photo { position: static; } }
+@media (max-width: 860px) { .about-photo img { aspect-ratio: 4 / 5; } .about-photo.second img { aspect-ratio: 3 / 2; } }
+
+.about-photos { display: grid; gap: 16px; }
+.about-photo.second { margin: 0; }
+@media (max-width: 860px) {
+  .about-photos { display: contents; }
+  .about-body { order: 1; }
+  .about-photo.second { order: 2; }
+}
