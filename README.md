@@ -8,7 +8,8 @@ A visitor types their address and, in about a minute, sees their property from a
 
 | Page | Who it's for | What it does |
 | --- | --- | --- |
-| `/` | Prospects | Address → aerial map → measured yard → pick add-ons → monthly range → create account |
+| `/` | Prospects | Brand page: about, services, and a "Get started" form that emails the owner and lands in the admin pipeline |
+| `/estimate.html` | You (unlisted) | The aerial pricing calculator: address → map → measured yard → monthly range. Not linked from the public site |
 | `/portal.html` | Clients & leads | Plan and price, next visit, visit reports (checklist, crew notes, before/after photos), notes to the crew |
 | `/admin.html` | You | Leads pipeline, contact details, confirm price, convert to client, log visits with photos, edit all pricing |
 
@@ -45,7 +46,7 @@ All numbers live in **Admin → Pricing** and can be changed without touching co
 
 Base plan per visit = lawn (by lawn size) + bed & shrub upkeep (by shrub count and bed size). Yearly = per visit × visits + the year's mulch, split into 12 payments. Example with the defaults: 8,000 sq ft lawn, 15 shrubs, 210 sq ft of beds ≈ $94 a visit ≈ **$350/month**; a half-acre property with a 16,000 sq ft lawn ≈ **$585/month**.
 
-Optional extras (pet waste, pressure washing, aeration, seasonal flowers, porch and patio detailing) are priced per visit × visits per year ÷ 12; weekly pet waste removal adds about $87/month.
+Optional extras (pet waste, pressure washing, aeration, porch and patio detailing) are priced per visit × visits per year ÷ 12; weekly pet waste removal adds about $87/month.
 
 **Priced for a crew, not a solo operator.** The defaults aim for about $90–100 of revenue per crew hour including drive time, which keeps crew cost near a third of revenue at roughly $31/hour loaded. Admin shows a private "Does this job pay?" check on every property (estimated crew hours, crew cost, what's left, revenue per crew hour) and flags jobs below your target. The crew-cost assumptions are editable under Admin → Pricing and are never sent to customers.
 

@@ -82,7 +82,7 @@ function detailHtml() {
             <div id="task-rows">${tasks.map((t) => taskRow(t, everyVisit.has(t))).join('')}</div>
             <p class="small"><button type="button" class="linkbtn" id="add-task">+ Add another task</button></p>
             <div class="field"><label for="v-notes">Note to the client</label><textarea id="v-notes" rows="2" maxlength="2000" placeholder="Anything they should know — a leaking sprinkler head, a loose fence board…"></textarea></div>
-            <div class="field"><label for="v-photos">Photos</label><input id="v-photos" type="file" accept="image/*" multiple><div class="photo-pick" id="photo-pick"></div></div>
+            <div class="field"><label for="v-photos">After photo <span class="muted" style="font-weight:400">(one is plenty)</span></label><input id="v-photos" type="file" accept="image/*" multiple><div class="photo-pick" id="photo-pick"></div></div>
             <div class="error" role="alert"></div>
             <button class="btn">Save visit report</button>
           </form>
@@ -130,7 +130,7 @@ function detailHtml() {
             <dt>Yearly revenue</dt><dd class="num">${money(e.revenue)}</dd>
             <dt>Crew time</dt><dd class="num">~${e.hoursPerYear} hrs/yr (${e.minutesPerVisit} min on site per mowing visit)</dd>
             <dt>Crew cost at ${money(state.pricing.labor.loadedCostPerHour)}/hr</dt><dd class="num">−${money(e.laborCost)}</dd>
-            <dt>Materials (mulch, flowers)</dt><dd class="num">−${money(e.materials)}</dd>
+            <dt>Mulch</dt><dd class="num">−${money(e.materials)}</dd>
             <dt>Left for overhead &amp; profit</dt><dd class="num">${money(e.grossProfit)} (${e.grossMarginPct}%)</dd>
             <dt>Revenue per crew hour</dt><dd class="num" style="color:${e.onTarget ? 'var(--green-700)' : 'var(--red)'}">${money(e.revenuePerHour)} <span class="muted" style="font-weight:400">(target ${money(state.pricing.labor.targetRevenuePerHour)})</span></dd>
           </dl>
@@ -337,7 +337,7 @@ app.addEventListener('change', async (e) => {
     for (const f of e.target.files) {
       if (state.photos.length >= 12) { toast('Up to 12 photos per visit'); break; }
       const blob = await shrink(f);
-      state.photos.push({ blob, url: URL.createObjectURL(blob), tag: '' });
+      state.photos.push({ blob, url: URL.createObjectURL(blob), tag: 'after' });
     }
     e.target.value = '';
     renderPhotoPick();

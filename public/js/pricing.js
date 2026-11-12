@@ -36,7 +36,6 @@ export const DEFAULT_PRICING = {
     petWaste: { enabled: true, perVisit: 20, perExtraDog: 5, visitsPerYear: 52 },
     pressureWash: { enabled: true, perSqft: 0.2, minPerVisit: 149, visitsPerYear: 4 },
     aeration: { enabled: true, base: 70, per1k: 15, minPerVisit: 149, visitsPerYear: 1 },
-    seasonalColor: { enabled: true, base: 150, perBedSqft: 0.25, minPerVisit: 225, visitsPerYear: 2 },
     patioDetail: { enabled: true, perVisit: 45, visitsPerYear: 12 },
     // Off by default: applying herbicide/fertilizer for hire in Tennessee
     // requires a TDA pest-control charter and a licensed applicator.
@@ -75,9 +74,8 @@ export const CORE = {
 
 export const ADDONS = [
   { key: 'petWaste', label: 'Pet waste removal', blurb: 'The whole yard scooped and hauled away.', cadence: 'Every week, all year', tasks: ['Scoop & remove pet waste'], needsDogs: true },
-  { key: 'pressureWash', label: 'Pressure washing', blurb: 'Driveway, walks, patio and steps.', cadence: 'Quarterly', tasks: ['Pressure wash driveway & walks', 'Pressure wash patio & steps'] },
+  { key: 'pressureWash', label: 'Pressure washing', blurb: 'Walks, patios, steps and hardscaping.', cadence: 'Quarterly', tasks: ['Pressure wash walks, patios & steps', 'Pressure wash hardscaping'] },
   { key: 'aeration', label: 'Aeration & overseeding', blurb: 'For a thicker lawn next year.', cadence: 'Once a year, in fall', tasks: ['Core-aerate lawn', 'Overseed'] },
-  { key: 'seasonalColor', label: 'Seasonal flowers & planters', blurb: 'Fresh annuals in your beds and containers, plants included.', cadence: 'Twice a year', tasks: ['Plant seasonal flowers', 'Refresh containers & planters'] },
   { key: 'patioDetail', label: 'Porch & patio detailing', blurb: 'Swept, cobwebs cleared, furniture wiped down.', cadence: 'Monthly', tasks: ['Sweep porches & patio', 'Clear cobwebs & wipe furniture'] },
   { key: 'lawnTreatment', label: 'Lawn fertilization & weed control', blurb: 'Seasonal fertilizer and weed control applications.', cadence: '7 rounds a year', tasks: ['Apply seasonal lawn treatment'] },
 ];
@@ -123,8 +121,6 @@ export function perVisitPrice(pricing, key, m, selections = {}) {
       return c.perVisit + c.perExtraDog * Math.max(0, Math.round(num(selections.dogs, 1)) - 1);
     case 'pressureWash':
       return Math.max(c.minPerVisit, c.perSqft * num(m.hardscapeSqft));
-    case 'seasonalColor':
-      return Math.max(c.minPerVisit, c.base + c.perBedSqft * num(m.bedSqft));
     case 'aeration':
     case 'lawnTreatment':
       return Math.max(c.minPerVisit, c.base + c.per1k * lawnK);
@@ -202,7 +198,6 @@ export function jobEconomics(pricing, m, selections = {}, monthly) {
   const extra = {
     petWaste: [8 + 3 * Math.max(0, num(selections.dogs, 1) - 1), false],
     patioDetail: [25, false],
-    seasonalColor: [75 + 0.15 * num(m.bedSqft), true],
     pressureWash: [Math.max(60, 20 + (num(m.hardscapeSqft) / 500) * 60), true],
     aeration: [30 + 6 * lawnK, true],
     lawnTreatment: [15 + 2 * lawnK, false],
@@ -215,10 +210,7 @@ export function jobEconomics(pricing, m, selections = {}, monthly) {
   const hours = minutes / 60;
   const revenue = num(monthly) * 12;
   const laborCost = hours * L.loadedCostPerHour;
-  // Mulch at roughly half its installed price; flowers at about 40% of what's charged.
-  let materials = mulchAnnual(pricing, m) * 0.5;
-  const color = pricing.addons.seasonalColor;
-  if (selections.addons?.seasonalColor && color?.enabled) materials += perVisitPrice(pricing, 'seasonalColor', m, selections) * color.visitsPerYear * 0.4;
+  const materials = mulchAnnual(pricing, m) * 0.5; // mulch at roughly half its installed price
   return {
     hoursPerYear: Math.round(hours),
     minutesPerVisit: Math.round(mowMin + upkeepMin),

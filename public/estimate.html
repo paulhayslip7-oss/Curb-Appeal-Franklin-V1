@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0e2216">
+  <title>Budgetary estimate — Curb Appeal Franklin</title>
+  <meta name="robots" content="noindex">
+  <meta name="description" content="All-inclusive, year-round grounds care for high-end homes in Franklin, TN, for one fixed monthly price.">
+  <link rel="stylesheet" href="/vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="container">
+      <a class="logo" href="/" aria-label="Curb Appeal Franklin"><span class="logo-script">Curb Appeal</span><span class="logo-sub">Franklin</span></a>
+      <nav>
+        <a class="hide-sm" href="/">Home</a>
+        <a class="btn ghost small" id="account-link" href="/portal.html">Client sign in</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section id="estimate">
+      <div class="container narrow-block">
+        <div class="eyebrow">Your monthly price</div>
+        <h2>See what it costs for your home.</h2>
+        <p class="muted">Enter your address. We measure the property from above and price your plan in about a minute.</p>
+        <form class="address-form on-light" id="address-form">
+          <input id="address" name="address" autocomplete="off" placeholder="Start typing your street address" aria-label="Your street address" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="address-suggestions" required>
+          <ul class="suggest" id="address-suggestions" role="listbox" aria-label="Matching addresses" hidden></ul>
+          <button class="btn" type="submit">Measure my property</button>
+        </form>
+        <div class="error" id="address-error" role="alert"></div>
+        <p class="acre-note"><strong>For homes under one acre.</strong> Over an acre, or commercial? Enter the address anyway and Paul will reach out with a formal proposal.</p>
+      </div>
+    </section>
+
+    <section id="estimator" hidden aria-live="polite">
+      <div class="container">
+        <div class="est-head">
+          <h2 id="est-address"></h2>
+          <button class="linkbtn" id="change-address">Change address</button>
+        </div>
+        <div class="est-grid">
+          <div>
+            <div class="card map-card">
+              <div class="map-wrap">
+                <div id="map" role="application" aria-label="Aerial view of the property with its outline"></div>
+                <div class="analyzing" id="analyzing" hidden>Measuring your yard…</div>
+              </div>
+              <div class="map-foot">
+                <div class="legend" aria-label="Map colours">
+                  <span><i style="background:#56d660"></i>Lawn</span>
+                  <span><i style="background:#106e34"></i>Shrubs &amp; plantings</span>
+                  <span><i style="background:#50a0ff"></i>Hard surfaces</span>
+                  <span><i style="background:#f06048"></i>House</span>
+                  <label style="margin:0 0 0 auto;font-weight:400;display:inline-flex;gap:6px;align-items:center"><input type="checkbox" id="overlay-toggle" checked style="width:16px;height:16px">Show colours</label>
+                </div>
+                <p class="small muted" id="map-tip" style="margin:0"><strong>Not quite your property line?</strong> Drag the white corners to fix it — the numbers update as you go.</p>
+                <div class="tiles" id="tiles"></div>
+                <p class="small" style="margin:10px 0 0"><button class="linkbtn" id="edit-measure">Adjust these numbers</button></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="plan">
+            <h3><span>Everything in your plan</span></h3>
+            <div class="core-card" id="core-card"></div>
+            <h3 style="margin-top:22px"><span>Optional extras</span><span class="small muted" id="bundle-hint" style="font:400 .85rem var(--sans)"></span></h3>
+            <div id="addons"></div>
+            <div class="summary" id="summary"></div>
+            <p class="fine">Questions about your estimate? <a href="sms:+16159451614">Text (615) 945-1614</a>.</p>
+            <p class="fine" style="margin-top:6px">A budgetary range, not a final quote. Your fixed price is confirmed at a free walkthrough.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Netlify Forms reads this at deploy time; the real form is the pop-up in estimate.js. -->
+  <form name="proposal" data-netlify="true" netlify-honeypot="company" hidden>
+    <input name="name"><input name="phone"><input name="email"><input name="kind"><input name="address"><input name="acres"><textarea name="notes"></textarea><input name="company">
+  </form>
+
+  <script src="/vendor/leaflet/leaflet.js"></script>
+  <script type="module" src="/js/estimate.js"></script>
+</body>
+</html>

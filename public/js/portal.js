@@ -44,7 +44,6 @@ function planHtml(p) {
     ${price}
     <p class="small muted" style="margin:6px 0 0">${p.finalMonthly ? '12 equal payments on your annual agreement. Same price every month.' : "We'll confirm your fixed monthly price at your free walkthrough."}</p>
     <ul class="plan-list">${lines.map((l) => `<li><span><strong>${esc(l.label)}</strong><br><span class="cad">${esc(l.cadence)}</span></span>${p.finalMonthly || overAcre ? '' : `<span class="num muted">${money(l.monthly)}/mo</span>`}</li>`).join('')}</ul>
-    ${isClient ? '' : `<p style="margin:14px 0 0"><a class="btn ghost small" href="/?address=${encodeURIComponent(p.address)}">Re-measure or change add-ons</a></p>`}
   </div>`;
 }
 
@@ -207,7 +206,7 @@ async function showProperty(id) {
 
   const history = visits.length
     ? visits.map((v) => visitHtml(v, p.id)).join('')
-    : `<div class="empty">${isClient ? 'Your first visit report will appear here — a checklist of what we did, notes from your crew, and before & after photos.' : 'Once you\'re a client, every visit shows up here: the checklist we worked from, what was completed, notes from your crew, and before & after photos.'}</div>`;
+    : `<div class="empty">${isClient ? 'Your first visit report will appear here — a checklist of what we did, notes from your crew, and a photo of the finished work.' : 'Once you\'re a client, every visit shows up here: the checklist we worked from, what was completed, notes from your crew, and a photo of the finished work.'}</div>`;
 
   app.innerHTML = `
     <div class="dash-head"><div><h1>Hi, ${firstName}.</h1>${others}</div></div>

@@ -5,8 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0e2216">
   <title>Curb Appeal Franklin — Private, year-round grounds care</title>
-  <meta name="description" content="Type your address and see a budgetary monthly price for all-inclusive, year-round grounds care in Franklin, TN — for high-end homes under one acre.">
-  <link rel="stylesheet" href="/vendor/leaflet/leaflet.css">
+  <meta name="description" content="All-inclusive, year-round grounds care for high-end homes in Franklin, TN, for one fixed monthly price.">
   <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
@@ -16,7 +15,6 @@
       <nav>
         <a class="hide-sm" href="#about">About</a>
         <a class="hide-sm" href="#services">Services</a>
-        <a class="hide-sm" href="#estimate">Pricing</a>
         <a class="hide-sm" href="sms:+16159451614">Text (615) 945-1614</a>
         <a class="btn ghost small" id="account-link" href="/portal.html">Client sign in</a>
       </nav>
@@ -117,62 +115,6 @@
       </div>
     </section>
 
-    <section id="estimate" class="section-alt">
-      <div class="container narrow-block">
-        <div class="eyebrow">Your monthly price</div>
-        <h2>See what it costs for your home.</h2>
-        <p class="muted">Enter your address. We measure the property from above and price your plan in about a minute.</p>
-        <form class="address-form on-light" id="address-form">
-          <input id="address" name="address" autocomplete="off" placeholder="Start typing your street address" aria-label="Your street address" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="address-suggestions" required>
-          <ul class="suggest" id="address-suggestions" role="listbox" aria-label="Matching addresses" hidden></ul>
-          <button class="btn" type="submit">Measure my property</button>
-        </form>
-        <div class="error" id="address-error" role="alert"></div>
-        <p class="acre-note"><strong>For homes under one acre.</strong> Over an acre, or commercial? Enter the address anyway and Paul will reach out with a formal proposal.</p>
-      </div>
-    </section>
-
-    <section id="estimator" hidden aria-live="polite">
-      <div class="container">
-        <div class="est-head">
-          <h2 id="est-address"></h2>
-          <button class="linkbtn" id="change-address">Change address</button>
-        </div>
-        <div class="est-grid">
-          <div>
-            <div class="card map-card">
-              <div class="map-wrap">
-                <div id="map" role="application" aria-label="Aerial view of the property with its outline"></div>
-                <div class="analyzing" id="analyzing" hidden>Measuring your yard…</div>
-              </div>
-              <div class="map-foot">
-                <div class="legend" aria-label="Map colours">
-                  <span><i style="background:#56d660"></i>Lawn</span>
-                  <span><i style="background:#106e34"></i>Shrubs &amp; plantings</span>
-                  <span><i style="background:#50a0ff"></i>Hard surfaces</span>
-                  <span><i style="background:#f06048"></i>House</span>
-                  <label style="margin:0 0 0 auto;font-weight:400;display:inline-flex;gap:6px;align-items:center"><input type="checkbox" id="overlay-toggle" checked style="width:16px;height:16px">Show colours</label>
-                </div>
-                <p class="small muted" id="map-tip" style="margin:0"><strong>Not quite your property line?</strong> Drag the white corners to fix it — the numbers update as you go.</p>
-                <div class="tiles" id="tiles"></div>
-                <p class="small" style="margin:10px 0 0"><button class="linkbtn" id="edit-measure">Adjust these numbers</button></p>
-              </div>
-            </div>
-          </div>
-
-          <div class="plan">
-            <h3><span>Everything in your plan</span></h3>
-            <div class="core-card" id="core-card"></div>
-            <h3 style="margin-top:22px"><span>Optional extras</span><span class="small muted" id="bundle-hint" style="font:400 .85rem var(--sans)"></span></h3>
-            <div id="addons"></div>
-            <div class="summary" id="summary"></div>
-            <p class="fine">Questions about your estimate? <a href="sms:+16159451614">Text (615) 945-1614</a>.</p>
-            <p class="fine" style="margin-top:6px">A budgetary range, not a final quote. Your fixed price is confirmed at a free walkthrough.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
     <section id="why">
       <div class="container">
         <div class="eyebrow">Why year-round</div>
@@ -207,7 +149,7 @@
         <div class="eyebrow">How it works</div>
         <h2>Three steps.</h2>
         <div class="steps">
-          <div class="step"><h3>We measure your property</h3><p class="muted">Enter your address for a budgetary monthly range.</p></div>
+          <div class="step"><h3>Tell us about your home</h3><p class="muted">Send the short form. It takes a minute.</p></div>
           <div class="step"><h3>We walk it with you</h3><p class="muted">A free visit to confirm the details and your fixed price.</p></div>
           <div class="step"><h3>You sign, we start</h3><p class="muted">Sign your annual agreement online. We take it from there.</p></div>
         </div>
@@ -221,7 +163,7 @@
           <h2>You'll never wonder what we did, or whether we came.</h2>
           <ul class="ticks">
             <li><strong>A report after every visit.</strong> What was done, and anything we skipped and why.</li>
-            <li><strong>Before and after photos.</strong> Every visit, on your account.</li>
+            <li><strong>A photo of the finished work.</strong> Every visit, on your account.</li>
             <li><strong>A direct line.</strong> Leave the crew a note, or text us.</li>
           </ul>
         </div>
@@ -233,9 +175,7 @@
             <li class="skip">Freshen mulch where thin<span class="why">Beds too wet after rain. First thing next visit.</span></li>
           </ul>
           <div class="note">Sprinkler head by the mailbox is leaking. Flagged it with a marker so it's easy to find.</div>
-          <div class="photos">
-            <figure><div class="swatch"></div><figcaption>Before</figcaption></figure>
-            <figure><div class="swatch after"></div><figcaption>After</figcaption></figure>
+          <div class="photos one">
             <figure><div class="swatch after"></div><figcaption>After</figcaption></figure>
           </div>
         </div>
@@ -247,19 +187,15 @@
   <form name="inquiry" data-netlify="true" netlify-honeypot="company" hidden>
     <input name="first_name"><input name="last_name"><input name="phone"><input name="email"><input name="address"><textarea name="services"></textarea><input name="company">
   </form>
-  <form name="proposal" data-netlify="true" netlify-honeypot="company" hidden>
-    <input name="name"><input name="phone"><input name="email"><input name="kind"><input name="address"><input name="acres"><textarea name="notes"></textarea><input name="company">
-  </form>
 
   <footer class="site-footer">
     <div class="container">
       <strong class="logo-script" style="color:#fff">Curb Appeal</strong>
       Franklin, Tennessee · Specializing in high-end properties · <a href="sms:+16159451614">Text (615) 945-1614</a> · <a href="tel:+16159451614">Call</a>
-      <p class="small" style="margin:12px 0 0">Online prices are budgetary ranges for homes under one acre. Aerial imagery: TDOT Aerial Surveys / Esri. Building outlines: FEMA. Parcel lines: Williamson County.</p>
+      
     </div>
   </footer>
 
-  <script src="/vendor/leaflet/leaflet.js"></script>
-  <script type="module" src="/js/estimate.js"></script>
+  <script type="module" src="/js/home.js"></script>
 </body>
 </html>
