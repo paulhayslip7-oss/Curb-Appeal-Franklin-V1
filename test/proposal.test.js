@@ -50,7 +50,7 @@ test('reviews: owner-managed, public to read, hidden when empty', async () => {
 });
 
 test('get started form: every field is required and the inquiry lands in the pipeline', async () => {
-  const good = { firstName: 'Jordan', lastName: 'Reed', phone: '(615) 555-0177', email: 'Jordan@Example.com', address: '12 Sample Ct, Franklin, TN', services: ['mowing', 'windows', 'not-a-service'] };
+  const good = { firstName: 'Jordan', lastName: 'Reed', phone: '(615) 555-0177', email: 'Jordan@Example.com', address: '12 Sample Ct, Franklin, TN', services: ['mowing', 'patioDetail', 'not-a-service'] };
   for (const missing of ['firstName', 'lastName', 'phone', 'email', 'address']) {
     assert.equal((await client()('POST', '/api/inquiries', { ...good, [missing]: '' })).status, 400, missing);
   }
@@ -58,6 +58,6 @@ test('get started form: every field is required and the inquiry lands in the pip
   const p = (await owner('GET', '/api/admin/properties')).data.properties.find((x) => x.address === good.address);
   assert.deepEqual(p.contact, { name: 'Jordan Reed', email: 'jordan@example.com', phone: '(615) 555-0177' });
   assert.equal(p.inquiry.wantsCore, true);
-  assert.deepEqual(p.selections.addons, { windows: true });
+  assert.deepEqual(p.selections.addons, { patioDetail: true });
   assert.equal(p.status, 'lead');
 });

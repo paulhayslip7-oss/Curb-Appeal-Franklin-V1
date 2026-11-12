@@ -30,7 +30,7 @@ test('annual agreement: owner sends, client e-signs, record is frozen', async ()
     address: '1 Test St, Franklin, TN, 37064', lat: 35.92, lon: -86.87,
     lot: [[-86.87, 35.92], [-86.869, 35.92], [-86.869, 35.921]],
     measurements: { lawnSqft: 8000, shrubCount: 15, bedSqft: 210, buildingSqft: 2500 },
-    selections: { addons: { windows: true } },
+    selections: { addons: { patioDetail: true } },
   });
   const id = created.data.property.id;
   await pat('POST', '/api/auth/signup', { name: 'Pat Client', email: 'pat@example.com', password: 'correct horse', estimateId: id, claimToken: created.data.claimToken });
@@ -50,7 +50,8 @@ test('annual agreement: owner sends, client e-signs, record is frozen', async ()
   assert.match(seen.text, /Pat Client/);
   assert.match(seen.text, /\$425 per month, in 12 equal monthly payments \(\$5,100 over the term\)/);
   assert.match(seen.text, /January 1, 2027/);
-  assert.match(seen.text, /Exterior window washing/);
+  assert.match(seen.text, /Porch & patio detailing/);
+  assert.match(seen.text, /Wipe down front porch entryway/);
   assert.match(seen.hash, /^[0-9a-f]{64}$/);
 
   // Signing needs the right person, a full name, consent, and the current text.

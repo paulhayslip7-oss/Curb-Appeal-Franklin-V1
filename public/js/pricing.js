@@ -35,10 +35,8 @@ export const DEFAULT_PRICING = {
   addons: {
     petWaste: { enabled: true, perVisit: 20, perExtraDog: 5, visitsPerYear: 52 },
     pressureWash: { enabled: true, perSqft: 0.2, minPerVisit: 149, visitsPerYear: 4 },
-    gutters: { enabled: true, base: 125, perRoofSqft: 0.03, visitsPerYear: 2 },
     aeration: { enabled: true, base: 70, per1k: 15, minPerVisit: 149, visitsPerYear: 1 },
     seasonalColor: { enabled: true, base: 150, perBedSqft: 0.25, minPerVisit: 225, visitsPerYear: 2 },
-    windows: { enabled: true, base: 150, perRoofSqft: 0.05, visitsPerYear: 2 },
     patioDetail: { enabled: true, perVisit: 45, visitsPerYear: 12 },
     // Off by default: applying herbicide/fertilizer for hire in Tennessee
     // requires a TDA pest-control charter and a licensed applicator.
@@ -59,7 +57,7 @@ export const DEFAULT_PRICING = {
 export const CORE = {
   key: 'mowing',
   label: 'Year-round grounds care',
-  blurb: 'Lawn, beds, shrubs, weeds, leaves and mulch, kept up at every visit. Outdoor faucets winterized every fall.',
+  blurb: 'Lawn, beds, shrubs, weeds, leaves and mulch, kept up at every visit. Hard surfaces blown off and the front entry wiped down each time. Outdoor faucets winterized every fall.',
   cadence: 'Weekly March–November, every other week in winter',
   tasks: [
     'Mow lawn (in season)',
@@ -69,7 +67,8 @@ export const CORE = {
     'Trim & tidy shrubs',
     'Clear leaves & debris',
     'Freshen mulch where thin',
-    'Blow off hard surfaces',
+    'Blow off all hard surfaces',
+    'Wipe down front porch entryway',
     'Winterize outdoor faucets (late fall)',
   ],
 };
@@ -77,10 +76,8 @@ export const CORE = {
 export const ADDONS = [
   { key: 'petWaste', label: 'Pet waste removal', blurb: 'The whole yard scooped and hauled away.', cadence: 'Every week, all year', tasks: ['Scoop & remove pet waste'], needsDogs: true },
   { key: 'pressureWash', label: 'Pressure washing', blurb: 'Driveway, walks, patio and steps.', cadence: 'Quarterly', tasks: ['Pressure wash driveway & walks', 'Pressure wash patio & steps'] },
-  { key: 'gutters', label: 'Gutter cleaning', blurb: 'Gutters and downspouts cleared and flushed.', cadence: 'Twice a year', tasks: ['Clear gutters', 'Flush downspouts'] },
   { key: 'aeration', label: 'Aeration & overseeding', blurb: 'For a thicker lawn next year.', cadence: 'Once a year, in fall', tasks: ['Core-aerate lawn', 'Overseed'] },
   { key: 'seasonalColor', label: 'Seasonal flowers & planters', blurb: 'Fresh annuals in your beds and containers, plants included.', cadence: 'Twice a year', tasks: ['Plant seasonal flowers', 'Refresh containers & planters'] },
-  { key: 'windows', label: 'Exterior window washing', blurb: 'Exterior panes, sills and screens washed by hand.', cadence: 'Twice a year', tasks: ['Wash exterior windows', 'Wipe sills & rinse screens'] },
   { key: 'patioDetail', label: 'Porch & patio detailing', blurb: 'Swept, cobwebs cleared, furniture wiped down.', cadence: 'Monthly', tasks: ['Sweep porches & patio', 'Clear cobwebs & wipe furniture'] },
   { key: 'lawnTreatment', label: 'Lawn fertilization & weed control', blurb: 'Seasonal fertilizer and weed control applications.', cadence: '7 rounds a year', tasks: ['Apply seasonal lawn treatment'] },
 ];
@@ -126,9 +123,6 @@ export function perVisitPrice(pricing, key, m, selections = {}) {
       return c.perVisit + c.perExtraDog * Math.max(0, Math.round(num(selections.dogs, 1)) - 1);
     case 'pressureWash':
       return Math.max(c.minPerVisit, c.perSqft * num(m.hardscapeSqft));
-    case 'gutters':
-    case 'windows':
-      return c.base + c.perRoofSqft * num(m.buildingSqft);
     case 'seasonalColor':
       return Math.max(c.minPerVisit, c.base + c.perBedSqft * num(m.bedSqft));
     case 'aeration':
@@ -208,10 +202,8 @@ export function jobEconomics(pricing, m, selections = {}, monthly) {
   const extra = {
     petWaste: [8 + 3 * Math.max(0, num(selections.dogs, 1) - 1), false],
     patioDetail: [25, false],
-    windows: [90 + 0.03 * num(m.buildingSqft), true],
     seasonalColor: [75 + 0.15 * num(m.bedSqft), true],
     pressureWash: [Math.max(60, 20 + (num(m.hardscapeSqft) / 500) * 60), true],
-    gutters: [60 + 0.02 * num(m.buildingSqft), true],
     aeration: [30 + 6 * lawnK, true],
     lawnTreatment: [15 + 2 * lawnK, false],
   };
