@@ -42,7 +42,7 @@ It is a budgetary tool, not a survey. Expect the lawn figure to be in the right 
 
 All numbers live in **Admin → Pricing** and can be changed without touching code. The defaults (in `public/js/pricing.js`) are typical 2025–26 Middle Tennessee residential rates — treat them as a starting point and tune them to your costs.
 
-**The base plan is all-inclusive.** Every client gets year-round grounds care: lawn, bed weeding, shrub trimming, leaf clearing and mulch top-ups at every visit (about 44 visits a year — weekly March–November, every other week in winter). Those are not sold separately; the pitch is that staying on top of a yard all year means there are never big weed-pull or leaf-removal jobs.
+**The base plan is all-inclusive.** Every client gets year-round exterior care: lawn, bed weeding, shrub trimming, leaf clearing and mulch top-ups at every visit (about 44 visits a year — weekly March–November, every other week in winter). Those are not sold separately; the pitch is that staying on top of a yard all year means there are never big weed-pull or leaf-removal jobs.
 
 Base plan per visit = lawn (by lawn size) + bed & shrub upkeep (by shrub count and bed size). Yearly = per visit × visits + the year's mulch, split into 12 payments. Example with the defaults: 8,000 sq ft lawn, 15 shrubs, 210 sq ft of beds ≈ $94 a visit ≈ **$350/month**; a half-acre property with a 16,000 sq ft lawn ≈ **$585/month**.
 

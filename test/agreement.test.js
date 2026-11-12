@@ -50,7 +50,8 @@ test('annual agreement: owner sends, client e-signs, record is frozen', async ()
   assert.match(seen.text, /Pat Client/);
   assert.match(seen.text, /\$425 per month, in 12 equal monthly payments \(\$5,100 over the term\)/);
   assert.match(seen.text, /January 1, 2027/);
-  assert.match(seen.text, /Porch & patio detailing/);
+  assert.match(seen.text, /Porch & Patio Detailing \(Every month\)/);
+  assert.match(seen.text, /Year-Round Exterior Care/);
   assert.match(seen.text, /Wipe down front porch entryway/);
   assert.match(seen.hash, /^[0-9a-f]{64}$/);
 

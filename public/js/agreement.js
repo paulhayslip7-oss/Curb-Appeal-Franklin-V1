@@ -12,7 +12,7 @@ export const BUSINESS_SMS = 'sms:+16159451614';
 
 export const DEFAULT_TERMS = `Payment. You will be billed the monthly price shown above once a month. The yearly cost of your plan is spread over twelve equal payments, so the amount is the same in busy and quiet months.
 
-Schedule. We visit weekly in the growing season and every other week in winter. Visits may move for weather or holidays; if we miss a visit we make it up.
+Schedule. We visit weekly from March through November and every other week in winter. Visits may move for weather or holidays; if we miss a visit we make it up.
 
 Access. You agree to give our crew access to the property on service days, including unlocked gates, and to keep pets secured while we work.
 

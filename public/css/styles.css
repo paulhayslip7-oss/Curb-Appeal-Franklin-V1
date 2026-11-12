@@ -377,3 +377,6 @@ details summary { cursor: pointer; min-height: 30px; }
 .service-sub { grid-column: 1 / -1; font: var(--label); letter-spacing: .2em; text-transform: uppercase; color: var(--gold); padding: 26px 0 12px; border-bottom: 1px solid var(--ink); }
 .photos.one { grid-template-columns: 1fr; }
 .photos.one figure { aspect-ratio: 16 / 9; }
+
+.hero h1 { max-width: 13ch; }
+@media (max-width: 900px) { .hero h1 { max-width: none; } }

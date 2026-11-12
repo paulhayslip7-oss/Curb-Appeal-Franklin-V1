@@ -55,9 +55,9 @@ export const DEFAULT_PRICING = {
 // member ticks off on a visit report.
 export const CORE = {
   key: 'mowing',
-  label: 'Year-round grounds care',
-  blurb: 'Lawn, beds, shrubs, weeds, leaves and mulch, kept up at every visit. Hard surfaces blown off and the front entry wiped down each time. Outdoor faucets winterized every fall.',
-  cadence: 'Weekly March–November, every other week in winter',
+  label: 'Year-Round Exterior Care',
+  blurb: 'Lawn, beds, shrubs, weeds, leaves and mulch at every visit. Hard surfaces blown off and the front entry wiped down. Outdoor faucets winterized each fall.',
+  cadence: 'Every week, every other week in winter',
   tasks: [
     'Mow lawn (in season)',
     'Edge walks, driveway & beds',
@@ -73,11 +73,11 @@ export const CORE = {
 };
 
 export const ADDONS = [
-  { key: 'petWaste', label: 'Pet waste removal', blurb: 'The whole yard scooped and hauled away.', cadence: 'Every week, all year', tasks: ['Scoop & remove pet waste'], needsDogs: true },
-  { key: 'pressureWash', label: 'Pressure washing', blurb: 'Walks, patios, steps and hardscaping.', cadence: 'Quarterly', tasks: ['Pressure wash walks, patios & steps', 'Pressure wash hardscaping'] },
-  { key: 'aeration', label: 'Aeration & overseeding', blurb: 'For a thicker lawn next year.', cadence: 'Once a year, in fall', tasks: ['Core-aerate lawn', 'Overseed'] },
-  { key: 'patioDetail', label: 'Porch & patio detailing', blurb: 'Swept, cobwebs cleared, furniture wiped down.', cadence: 'Monthly', tasks: ['Sweep porches & patio', 'Clear cobwebs & wipe furniture'] },
-  { key: 'lawnTreatment', label: 'Lawn fertilization & weed control', blurb: 'Seasonal fertilizer and weed control applications.', cadence: '7 rounds a year', tasks: ['Apply seasonal lawn treatment'] },
+  { key: 'petWaste', label: 'Pet Waste Removal', blurb: 'The whole yard scooped and hauled away.', cadence: 'Every week', tasks: ['Scoop & remove pet waste'], needsDogs: true },
+  { key: 'pressureWash', label: 'Pressure Washing', blurb: 'Walks, patios, steps and hardscaping.', cadence: 'Every quarter', tasks: ['Pressure wash walks, patios & steps', 'Pressure wash hardscaping'] },
+  { key: 'aeration', label: 'Aeration & Overseeding', blurb: 'For a thicker lawn next year.', cadence: 'Once a year', tasks: ['Core-aerate lawn', 'Overseed'] },
+  { key: 'patioDetail', label: 'Porch & Patio Detailing', blurb: 'Swept, cobwebs cleared and furniture wiped down.', cadence: 'Every month', tasks: ['Sweep porches & patio', 'Clear cobwebs & wipe furniture'] },
+  { key: 'lawnTreatment', label: 'Lawn Fertilization & Weed Control', blurb: 'Seasonal fertilizer and weed control applications.', cadence: '7 rounds a year', tasks: ['Apply seasonal lawn treatment'] },
 ];
 
 const num = (v, fallback = 0) => (Number.isFinite(Number(v)) ? Number(v) : fallback);
