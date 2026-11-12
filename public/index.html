@@ -31,8 +31,7 @@
           <h1>We stay on top of your yard, so it never <em>gets away</em> from you.</h1>
           <p class="lead">Year-round care for Franklin's finest homes. One agreement, one monthly price.</p>
           <div class="hero-cta">
-            <a class="btn light" href="#estimate">See my monthly price</a>
-            <a class="btn outline" href="sms:+16159451614">Text (615) 945-1614</a>
+            <button class="btn light" type="button" data-start>Get started</button>
           </div>
           <ul class="hero-points">
             <li>Specializing in high-end properties</li>
@@ -86,7 +85,7 @@
         <div class="eyebrow">Services</div>
         <h2>One plan for the grounds. Extras for the rest.</h2>
         <div class="service-grid" id="service-grid"></div>
-        <p style="margin-top:32px"><a class="btn" href="#estimate">See my monthly price</a></p>
+        <p style="margin-top:32px"><button class="btn" type="button" data-start>Get started</button></p>
       </div>
     </section>
 
@@ -242,6 +241,9 @@
   </main>
 
   <!-- Netlify Forms reads this at deploy time; the real form is the pop-up in estimate.js. -->
+  <form name="inquiry" data-netlify="true" netlify-honeypot="company" hidden>
+    <input name="first_name"><input name="last_name"><input name="phone"><input name="email"><input name="address"><textarea name="services"></textarea><input name="company">
+  </form>
   <form name="proposal" data-netlify="true" netlify-honeypot="company" hidden>
     <input name="name"><input name="phone"><input name="email"><input name="kind"><input name="address"><input name="acres"><textarea name="notes"></textarea><input name="company">
   </form>

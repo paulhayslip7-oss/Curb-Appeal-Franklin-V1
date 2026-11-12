@@ -157,6 +157,47 @@ export function createApp(store, env = {}) {
       return json(found);
     }],
 
+    // The home page's "Get started" form.
+    ['POST', '/api/inquiries', async (req) => {
+      rateLimit(req, 'inquiry', 8);
+      const b = await body(req);
+      const first = str(b.firstName, 40);
+      const last = str(b.lastName, 40);
+      const phone = str(b.phone, 30);
+      const email = str(b.email, 120).toLowerCase();
+      const address = str(b.address, 160);
+      if (!first || !last) bad('Please enter your first and last name.');
+      if (phone.replace(/\D/g, '').length < 7) bad('Please enter a phone number.');
+      if (!isEmail(email)) bad('Please enter a valid email address.');
+      if (address.length < 5) bad('Please enter the address for service.');
+      const keys = Array.isArray(b.services) ? b.services.map(String) : [];
+      const selections = cleanSelections({ addons: Object.fromEntries(keys.map((k) => [k, true])) });
+      const measurements = cleanMeasurements({});
+      const p = {
+        id: newId(),
+        userId: null,
+        claimHash: newId(18),
+        status: 'lead',
+        address,
+        lat: 0,
+        lon: 0,
+        lot: [],
+        lotSource: 'estimate',
+        measurements,
+        selections,
+        quote: computeQuote(await getPricing(), measurements, selections),
+        finalMonthly: null,
+        nextVisit: null,
+        adminNotes: '',
+        agreement: null,
+        inquiry: { name: `${first} ${last}`, phone, email, wantsCore: keys.includes('mowing'), at: new Date().toISOString() },
+        messages: [],
+        createdAt: new Date().toISOString(),
+      };
+      await saveProperty(p);
+      return json({ ok: true }, 201);
+    }],
+
     // Properties over an acre skip the calculator: the visitor leaves their
     // details and the owner follows up with a formal proposal.
     ['POST', '/api/proposal-requests', async (req) => {
@@ -345,7 +386,7 @@ export function createApp(store, env = {}) {
         if (u) users.set(uid, { name: u.name, email: u.email, phone: u.phone });
       }));
       props.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
-      return json({ properties: props.map((p) => ({ ...publicProperty(p), adminNotes: p.adminNotes, contact: users.get(p.userId) || (p.proposal ? { name: p.proposal.name, email: p.proposal.email, phone: p.proposal.phone } : null) })) });
+      return json({ properties: props.map((p) => ({ ...publicProperty(p), adminNotes: p.adminNotes, contact: users.get(p.userId) || (p.inquiry ? { name: p.inquiry.name, email: p.inquiry.email, phone: p.inquiry.phone } : null) || (p.proposal ? { name: p.proposal.name, email: p.proposal.email, phone: p.proposal.phone } : null) })) });
     }],
 
     ['PATCH', '/api/admin/properties/:id', async (req, url, { id }) => {

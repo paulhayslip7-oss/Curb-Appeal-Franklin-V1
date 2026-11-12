@@ -40,12 +40,12 @@ function pipelineHtml() {
     ${rows.length ? `<div class="table-wrap"><table>
       <thead><tr><th>Address</th><th>Contact</th><th>Status</th><th>Lawn</th><th>Add-ons</th><th>Monthly</th><th>Per crew hour</th><th>Created</th></tr></thead>
       <tbody>${rows.map((p) => `<tr data-open="${p.id}" tabindex="0">
-        <td><strong>${esc(p.address)}</strong>${p.proposal ? ' <span class="pill lead">Over 1 acre</span>' : ''}${(p.messages || []).at(-1)?.from === 'client' ? ' <span class="pill lead">New note</span>' : ''}</td>
+        <td><strong>${esc(p.address)}</strong>${p.proposal ? ' <span class="pill lead">Over 1 acre</span>' : ''}${p.inquiry ? ' <span class="pill lead">Inquiry</span>' : ''}${(p.messages || []).at(-1)?.from === 'client' ? ' <span class="pill lead">New note</span>' : ''}</td>
         <td>${p.contact ? `${esc(p.contact.name)}<br><span class="small muted">${esc(p.contact.phone || p.contact.email)}</span>` : '<span class="muted">No account yet</span>'}</td>
         <td><span class="pill ${p.status}">${esc(STATUS_LABEL[p.status])}</span></td>
         <td class="num">${sqft(p.measurements.lawnSqft)} sq ft</td>
         <td class="num">${p.quote.addons.length}</td>
-        <td class="num"><strong>${p.proposal && !p.finalMonthly ? 'Proposal' : priceOf(p)}</strong></td>
+        <td class="num"><strong>${(p.proposal || p.inquiry) && !p.finalMonthly ? (p.inquiry ? 'To quote' : 'Proposal') : priceOf(p)}</strong></td>
         <td class="num" style="color:${econOf(p).onTarget ? 'var(--green-700)' : 'var(--red)'}">${money(econOf(p).revenuePerHour)}</td>
         <td class="small">${esc(fmtDate(p.createdAt, { month: 'short', day: 'numeric' }))}</td>
       </tr>`).join('')}</tbody></table></div>` : '<div class="empty">Nothing here yet. Every address entered on the website shows up in this list.</div>'}`;
@@ -94,6 +94,12 @@ function detailHtml() {
           <h2 style="font-size:1.7rem">Contact</h2>
           ${c ? `<dl class="kv"><dt>Name</dt><dd>${esc(c.name)}</dd><dt>Phone</dt><dd>${c.phone ? `<a href="tel:${esc(c.phone)}">${esc(c.phone)}</a>` : '—'}</dd><dt>Email</dt><dd><a href="mailto:${esc(c.email)}">${esc(c.email)}</a></dd></dl>` : '<p class="muted small" style="margin:0">This visitor measured their yard but hasn\'t created an account yet. A door hanger or postcard to this address is your follow-up.</p>'}
         </div>
+        ${p.inquiry ? `<div class="card" style="border-color:var(--ink)">
+          <h2 style="font-size:1.7rem">Website inquiry</h2>
+          <p class="small muted">Sent ${esc(fmtDate(p.inquiry.at, { month: 'short', day: 'numeric', year: 'numeric' }))} from the Get started form. Interested in:</p>
+          <ul class="checks" style="margin-bottom:0">${[...(p.inquiry.wantsCore ? [CORE.label] : []), ...ADDONS.filter((a) => p.selections.addons[a.key]).map((a) => a.label)].map((l) => `<li>${esc(l)}</li>`).join('') || '<li class="skip">Nothing ticked</li>'}</ul>
+          <p class="small muted" style="margin:12px 0 0">The property hasn't been measured yet, so the figures below are placeholders. Enter measurements after you walk it.</p>
+        </div>` : ''}
         ${p.proposal ? `<div class="card" style="border-color:var(--ink)">
           <h2 style="font-size:1.7rem">Proposal request</h2>
           <dl class="kv"><dt>Property</dt><dd>${p.proposal.kind === 'commercial' ? 'Commercial' : 'Residential'}, about ${(m.lotSqft / 43560).toFixed(1)} acres</dd><dt>Requested</dt><dd>${esc(fmtDate(p.proposal.at, { month: 'short', day: 'numeric', year: 'numeric' }))}</dd></dl>
