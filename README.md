@@ -22,6 +22,12 @@ The wording of the terms is yours to edit under **Admin → Agreement**. **The d
 
 Clients can also text the business number from the home page, the estimate, the agreement and their dashboard. To change that number, edit `public/js/agreement.js` and the `sms:` links in `public/index.html`.
 
+## Over one acre, and reviews
+
+The calculator is for homes under one acre. When the lot at an address is larger, the visitor gets a short form instead of a price. The request is saved to the admin pipeline (tagged "Over 1 acre") and also sent through Netlify Forms, which emails the owner. The destination address is set on the Netlify site (Forms → Notifications), not in this code.
+
+The home page has a reviews section that stays hidden until you add reviews under **Admin → Reviews**. Add only real reviews from real clients.
+
 ## How the measuring works
 
 1. **Find the house** — Tennessee's statewide address points (rooftop-accurate), with the US Census geocoder as a fallback.

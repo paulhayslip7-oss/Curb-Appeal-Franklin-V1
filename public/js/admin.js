@@ -14,6 +14,7 @@ async function load() {
   state.properties = properties;
   state.pricing = pricing;
   state.terms = (await api('GET', '/api/admin/agreement-terms')).terms;
+  state.reviews = (await api('GET', '/api/config')).reviews || [];
 }
 
 const econOf = (p) => jobEconomics(state.pricing, p.measurements, p.selections, p.finalMonthly || p.quote.monthly);
@@ -39,12 +40,12 @@ function pipelineHtml() {
     ${rows.length ? `<div class="table-wrap"><table>
       <thead><tr><th>Address</th><th>Contact</th><th>Status</th><th>Lawn</th><th>Add-ons</th><th>Monthly</th><th>Per crew hour</th><th>Created</th></tr></thead>
       <tbody>${rows.map((p) => `<tr data-open="${p.id}" tabindex="0">
-        <td><strong>${esc(p.address)}</strong>${(p.messages || []).at(-1)?.from === 'client' ? ' <span class="pill lead">New note</span>' : ''}</td>
+        <td><strong>${esc(p.address)}</strong>${p.proposal ? ' <span class="pill lead">Over 1 acre</span>' : ''}${(p.messages || []).at(-1)?.from === 'client' ? ' <span class="pill lead">New note</span>' : ''}</td>
         <td>${p.contact ? `${esc(p.contact.name)}<br><span class="small muted">${esc(p.contact.phone || p.contact.email)}</span>` : '<span class="muted">No account yet</span>'}</td>
         <td><span class="pill ${p.status}">${esc(STATUS_LABEL[p.status])}</span></td>
         <td class="num">${sqft(p.measurements.lawnSqft)} sq ft</td>
         <td class="num">${p.quote.addons.length}</td>
-        <td class="num"><strong>${priceOf(p)}</strong></td>
+        <td class="num"><strong>${p.proposal && !p.finalMonthly ? 'Proposal' : priceOf(p)}</strong></td>
         <td class="num" style="color:${econOf(p).onTarget ? 'var(--green-700)' : 'var(--red)'}">${money(econOf(p).revenuePerHour)}</td>
         <td class="small">${esc(fmtDate(p.createdAt, { month: 'short', day: 'numeric' }))}</td>
       </tr>`).join('')}</tbody></table></div>` : '<div class="empty">Nothing here yet. Every address entered on the website shows up in this list.</div>'}`;
@@ -93,6 +94,12 @@ function detailHtml() {
           <h2 style="font-size:1.7rem">Contact</h2>
           ${c ? `<dl class="kv"><dt>Name</dt><dd>${esc(c.name)}</dd><dt>Phone</dt><dd>${c.phone ? `<a href="tel:${esc(c.phone)}">${esc(c.phone)}</a>` : '—'}</dd><dt>Email</dt><dd><a href="mailto:${esc(c.email)}">${esc(c.email)}</a></dd></dl>` : '<p class="muted small" style="margin:0">This visitor measured their yard but hasn\'t created an account yet. A door hanger or postcard to this address is your follow-up.</p>'}
         </div>
+        ${p.proposal ? `<div class="card" style="border-color:var(--ink)">
+          <h2 style="font-size:1.7rem">Proposal request</h2>
+          <dl class="kv"><dt>Property</dt><dd>${p.proposal.kind === 'commercial' ? 'Commercial' : 'Residential'}, about ${(m.lotSqft / 43560).toFixed(1)} acres</dd><dt>Requested</dt><dd>${esc(fmtDate(p.proposal.at, { month: 'short', day: 'numeric', year: 'numeric' }))}</dd></dl>
+          ${p.proposal.notes ? `<div class="note">${esc(p.proposal.notes)}</div>` : ''}
+          <p class="small muted" style="margin:10px 0 0">Over an acre, so no online price was shown. The figures below are placeholders until you walk it and set a confirmed price.</p>
+        </div>` : ''}
         <div class="card">
           <h2 style="font-size:1.7rem">Status &amp; price</h2>
           <form id="status-form">
@@ -174,6 +181,23 @@ function agreementAdminHtml(p, contact) {
     </form>`;
 }
 
+function reviewsHtml() {
+  return `
+    <p class="muted" style="max-width:70ch">Reviews you add here appear on the home page. Only add real reviews from real clients, word for word, and say where each one came from. Posting invented reviews is against FTC rules and Google's terms.</p>
+    ${state.reviews.length ? `<div class="table-wrap" style="margin:18px 0"><table><thead><tr><th>Name</th><th>Review</th><th>Stars</th><th>Source</th><th></th></tr></thead><tbody>${state.reviews.map((r, i) => `<tr style="cursor:default"><td>${esc(r.name)}</td><td style="display:table-cell">${esc(r.text)}</td><td style="display:table-cell">${r.stars}</td><td>${esc(r.source)}</td><td style="display:table-cell"><button class="btn danger small" data-del-review="${i}">Remove</button></td></tr>`).join('')}</tbody></table></div>` : '<div class="empty" style="margin:18px 0">No reviews yet. The reviews section stays hidden on the home page until you add one.</div>'}
+    <form id="review-form" class="card" style="max-width:640px">
+      <h2 style="font-size:1.7rem">Add a review</h2>
+      <div class="row">
+        <div class="field"><label for="rv-name">Client's name</label><input id="rv-name" maxlength="60" required></div>
+        <div class="field"><label for="rv-source">Where it was posted</label><input id="rv-source" maxlength="40" placeholder="Google review" value="Google review"></div>
+        <div class="field" style="flex:0 1 110px"><label for="rv-stars">Stars</label><select id="rv-stars"><option>5</option><option>4</option><option>3</option><option>2</option><option>1</option></select></div>
+      </div>
+      <div class="field"><label for="rv-text">Their words, exactly</label><textarea id="rv-text" rows="4" maxlength="600" required></textarea></div>
+      <div class="error" role="alert"></div>
+      <button class="btn small">Add review</button>
+    </form>`;
+}
+
 function termsHtml() {
   const sample = agreementText({ clientName: 'Pat Client', address: '123 Example Ln, Franklin, TN', monthly: 485, startDate: todayIso(), termMonths: 12, services: [{ label: CORE.label, cadence: CORE.cadence }], tasks: CORE.tasks, terms: state.terms });
   return `
@@ -245,8 +269,8 @@ function render() {
   if (state.detail) { app.innerHTML = detailHtml(); const t = $('#thread'); if (t) t.scrollTop = t.scrollHeight; return; }
   app.innerHTML = `
     <div class="dash-head"><h1>Owner admin</h1></div>
-    <div class="tabs" role="tablist"><button role="tab" class="${state.tab === 'pipeline' ? 'on' : ''}" data-tab="pipeline">Leads &amp; clients</button><button role="tab" class="${state.tab === 'pricing' ? 'on' : ''}" data-tab="pricing">Pricing</button><button role="tab" class="${state.tab === 'terms' ? 'on' : ''}" data-tab="terms">Agreement</button></div>
-    ${state.tab === 'pipeline' ? pipelineHtml() : state.tab === 'terms' ? termsHtml() : pricingHtml()}`;
+    <div class="tabs" role="tablist"><button role="tab" class="${state.tab === 'pipeline' ? 'on' : ''}" data-tab="pipeline">Leads &amp; clients</button><button role="tab" class="${state.tab === 'pricing' ? 'on' : ''}" data-tab="pricing">Pricing</button><button role="tab" class="${state.tab === 'terms' ? 'on' : ''}" data-tab="terms">Agreement</button><button role="tab" class="${state.tab === 'reviews' ? 'on' : ''}" data-tab="reviews">Reviews</button></div>
+    ${state.tab === 'pipeline' ? pipelineHtml() : state.tab === 'terms' ? termsHtml() : state.tab === 'reviews' ? reviewsHtml() : pricingHtml()}`;
 }
 
 async function openDetail(id) {
@@ -277,6 +301,11 @@ app.addEventListener('click', async (e) => {
       await load();
       render();
       toast('Property deleted');
+    } else if (t.dataset.delReview !== undefined) {
+      if (!confirm('Remove this review from the home page?')) return;
+      state.reviews = (await api('PUT', '/api/admin/reviews', { reviews: state.reviews.filter((_, i) => i !== Number(t.dataset.delReview)) })).reviews;
+      render();
+      toast('Review removed');
     } else if (t.id === 'withdraw-agreement') {
       if (!confirm('Withdraw this agreement? The client will no longer be able to sign it.')) return;
       await api('DELETE', `/api/admin/properties/${state.detail.property.id}/agreement`);
@@ -343,6 +372,11 @@ app.addEventListener('submit', async (e) => {
     } else if (form.id === 'msg-form') {
       await api('POST', `/api/properties/${id}/messages`, { text: $('#msg').value });
       await refreshDetail();
+    } else if (form.id === 'review-form') {
+      const review = { name: $('#rv-name').value, text: $('#rv-text').value, stars: Number($('#rv-stars').value), source: $('#rv-source').value };
+      state.reviews = (await api('PUT', '/api/admin/reviews', { reviews: [...state.reviews, review] })).reviews;
+      render();
+      toast('Review added to the home page');
     } else if (form.id === 'agreement-form') {
       await api('POST', `/api/admin/properties/${id}/agreement`, { startDate: $('#a-start').value });
       await refreshDetail();

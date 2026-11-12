@@ -137,7 +137,8 @@ export function createApp(store, env = {}) {
     // Pricing for the estimator. The owner's cost assumptions stay private.
     ['GET', '/api/config', async (req) => {
       const { labor, ...pricing } = await getPricing();
-      return json({ pricing: (await session(req))?.role === 'admin' ? { ...pricing, labor } : pricing });
+      const reviews = (await store.get('config/reviews'))?.reviews || [];
+      return json({ pricing: (await session(req))?.role === 'admin' ? { ...pricing, labor } : pricing, reviews });
     }],
 
     // Type-ahead for the address box.
@@ -154,6 +155,57 @@ export function createApp(store, env = {}) {
       const found = await lookupAddress(address);
       if (!found) bad("We couldn't find that address. Check the spelling and include the city and state.", 404);
       return json(found);
+    }],
+
+    // Properties over an acre skip the calculator: the visitor leaves their
+    // details and the owner follows up with a formal proposal.
+    ['POST', '/api/proposal-requests', async (req) => {
+      rateLimit(req, 'proposal', 8);
+      const b = await body(req);
+      const name = str(b.name, 80);
+      const phone = str(b.phone, 30);
+      const email = str(b.email, 120).toLowerCase();
+      const address = str(b.address, 160);
+      if (!name) bad('Please enter your name.');
+      if (!phone && !email) bad('Leave a phone number or an email so we can reach you.');
+      if (email && !isEmail(email)) bad('That email address doesn\'t look right.');
+      if (!address) bad('Missing the property address.');
+      const measurements = cleanMeasurements({ lotSqft: b.lotSqft });
+      const selections = cleanSelections({});
+      const p = {
+        id: newId(),
+        userId: null,
+        claimHash: newId(18),
+        status: 'lead',
+        address,
+        lat: numIn(b.lat, -90, 90),
+        lon: numIn(b.lon, -180, 180),
+        lot: cleanRing(b.lot) || [],
+        lotSource: b.lotSource === 'parcel' ? 'parcel' : 'estimate',
+        measurements,
+        selections,
+        quote: computeQuote(await getPricing(), measurements, selections),
+        finalMonthly: null,
+        nextVisit: null,
+        adminNotes: '',
+        agreement: null,
+        proposal: { name, phone, email, kind: b.kind === 'commercial' ? 'commercial' : 'residential', notes: str(b.notes, 1500), at: new Date().toISOString() },
+        messages: [],
+        createdAt: new Date().toISOString(),
+      };
+      await saveProperty(p);
+      return json({ ok: true }, 201);
+    }],
+
+    // Reviews shown on the home page. Entered by the owner from real ones.
+    ['PUT', '/api/admin/reviews', async (req) => {
+      await requireAdmin(req);
+      const b = await body(req);
+      const reviews = (Array.isArray(b.reviews) ? b.reviews : []).slice(0, 12)
+        .map((r) => ({ name: str(r?.name, 60), text: str(r?.text, 600), stars: Math.round(numIn(r?.stars, 1, 5, 5)), source: str(r?.source, 40) }))
+        .filter((r) => r.name && r.text);
+      await store.set('config/reviews', { reviews });
+      return json({ reviews });
     }],
 
     // Save an estimate. Anonymous visitors get a claim token so the estimate
@@ -293,7 +345,7 @@ export function createApp(store, env = {}) {
         if (u) users.set(uid, { name: u.name, email: u.email, phone: u.phone });
       }));
       props.sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
-      return json({ properties: props.map((p) => ({ ...publicProperty(p), adminNotes: p.adminNotes, contact: users.get(p.userId) || null })) });
+      return json({ properties: props.map((p) => ({ ...publicProperty(p), adminNotes: p.adminNotes, contact: users.get(p.userId) || (p.proposal ? { name: p.proposal.name, email: p.proposal.email, phone: p.proposal.phone } : null) })) });
     }],
 
     ['PATCH', '/api/admin/properties/:id', async (req, url, { id }) => {

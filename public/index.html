@@ -84,7 +84,7 @@
     <section id="about">
       <div class="container about">
         <figure class="about-photo">
-          <img src="/img/about.jpg" width="1400" height="933" alt="The owner and his wife Britney, smiling in a grassy field and holding their Bernese Mountain Dog between them." loading="lazy">
+          <img src="/img/about.jpg" width="1400" height="933" alt="Paul and his wife Britney, smiling in a grassy field and holding their Bernese Mountain Dog between them." loading="lazy">
         </figure>
         <div class="about-body">
           <div class="eyebrow">About us</div>
@@ -93,8 +93,16 @@
           <p>I'm married to my high school sweetheart, Britney, a physician assistant in dermatology. Six years in, our three-year-old Bernese Mountain Dog keeps our hands full.</p>
           <p>I have eight years in lawn care. I built and sold my first company, Hayslip Lawn Care, thinking corporate America was the path for me. Almost ten years later, I'm glad to be back in a service business, with the best communication and the best quality in the industry.</p>
           <p>As with anything, you get what you pay for.</p>
-          <p class="about-sign">Owner, Curb Appeal Franklin &nbsp;·&nbsp; <a href="sms:+16159451614">Text (615) 945-1614</a></p>
+          <p class="about-sign">Paul Hayslip, Owner &nbsp;·&nbsp; <a href="sms:+16159451614">Text (615) 945-1614</a></p>
         </div>
+      </div>
+    </section>
+
+    <section id="reviews" class="section-alt" hidden>
+      <div class="container">
+        <div class="eyebrow">What clients say</div>
+        <h2>In their words.</h2>
+        <div class="review-grid" id="review-grid"></div>
       </div>
     </section>
 
@@ -109,7 +117,7 @@
           <button class="btn" type="submit">Measure my property</button>
         </form>
         <div class="error" id="address-error" role="alert"></div>
-        <p class="acre-note"><strong>For homes under one acre.</strong> Larger estates and commercial properties are walked in person for a formal proposal. <a href="sms:+16159451614">Text (615) 945-1614</a> to arrange one.</p>
+        <p class="acre-note"><strong>For homes under one acre.</strong> Over an acre, or commercial? Enter the address anyway and Paul will reach out with a formal proposal.</p>
       </div>
     </section>
 
@@ -232,6 +240,11 @@
       </div>
     </section>
   </main>
+
+  <!-- Netlify Forms reads this at deploy time; the real form is the pop-up in estimate.js. -->
+  <form name="proposal" data-netlify="true" netlify-honeypot="company" hidden>
+    <input name="name"><input name="phone"><input name="email"><input name="kind"><input name="address"><input name="acres"><textarea name="notes"></textarea><input name="company">
+  </form>
 
   <footer class="site-footer">
     <div class="container">

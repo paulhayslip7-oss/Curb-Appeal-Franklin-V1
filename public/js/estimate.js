@@ -5,6 +5,8 @@ import { ADDONS, CORE, computeQuote, monthlyFor } from './pricing.js';
 import { analyzeYard, groundResolution, lonLatToWorldPx, polygonAreaSqft, renderOverlay, worldPxToLonLat, SQFT_PER_SQM } from './analyze.js';
 import { ZOOM, aerialLayer, loadTile, pickSource } from './imagery.js';
 
+const ACRE = 43560;
+
 const state = {
   user: null,
   pricing: null,
@@ -38,6 +40,12 @@ $('#address-form').addEventListener('submit', async (e) => {
   btn.textContent = 'Finding your home…';
   try {
     const place = await api('GET', `/api/lookup?address=${encodeURIComponent($('#address').value)}`);
+    // Over an acre: no calculator. Take their details for a formal proposal.
+    const lotSqft = polygonAreaSqft(place.lot);
+    if (lotSqft > ACRE) {
+      proposalModal({ address: place.label, lat: place.lat, lon: place.lon, lot: place.lot, lotSource: place.lotSource, lotSqft });
+      return;
+    }
     savedEstimate.clear();
     state.place = place;
     state.lot = place.lot;
@@ -105,6 +113,63 @@ $('#address-form').addEventListener('submit', async (e) => {
   });
   input.addEventListener('blur', () => setTimeout(close, 120));
   $('#address-form').addEventListener('submit', () => { seq++; clearTimeout(timer); close(); });
+}
+
+// ---------- over one acre: request a formal proposal ----------
+function proposalModal(prop) {
+  const back = document.createElement('div');
+  back.className = 'modal-back';
+  back.innerHTML = `
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="pr-title">
+      <button class="close" aria-label="Close">×</button>
+      <h2 id="pr-title" style="font-size:2rem">Let's walk this one.</h2>
+      <p class="muted">This budgetary calculator is most accurate for properties under 1 acre. For properties over 1 acre, fill out this form and Paul will reach out.</p>
+      <p class="small" style="margin-bottom:18px"><strong>${esc(prop.address)}</strong> · about ${(prop.lotSqft / ACRE).toFixed(1)} acres</p>
+      <form novalidate>
+        <div class="field"><label for="pr-name">Name</label><input id="pr-name" name="name" autocomplete="name" required></div>
+        <div class="row">
+          <div class="field"><label for="pr-phone">Mobile phone</label><input id="pr-phone" name="phone" type="tel" autocomplete="tel"></div>
+          <div class="field"><label for="pr-email">Email</label><input id="pr-email" name="email" type="email" autocomplete="email"></div>
+        </div>
+        <div class="field"><label for="pr-kind">Property type</label><select id="pr-kind" name="kind"><option value="residential">Residential</option><option value="commercial">Commercial</option></select></div>
+        <div class="field"><label for="pr-notes">Anything we should know? <span class="muted" style="font-weight:400">(optional)</span></label><textarea id="pr-notes" name="notes" rows="3" maxlength="1500"></textarea></div>
+        <input name="company" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;min-height:0">
+        <div class="error" role="alert"></div>
+        <button class="btn block" type="submit">Request my proposal</button>
+      </form>
+    </div>`;
+  const close = () => { back.remove(); document.removeEventListener('keydown', onKey); };
+  const onKey = (e) => { if (e.key === 'Escape') close(); };
+  document.addEventListener('keydown', onKey);
+  back.addEventListener('click', (e) => { if (e.target === back || e.target.closest('.close') || e.target.closest('[data-done]')) close(); });
+  back.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const f = Object.fromEntries(new FormData(e.target));
+    if (f.company) return close(); // spam bots fill hidden fields
+    const btn = $('button[type=submit]', back);
+    btn.disabled = true;
+    $('.error', back).textContent = '';
+    try {
+      await api('POST', '/api/proposal-requests', { ...prop, name: f.name, phone: f.phone, email: f.email, kind: f.kind, notes: f.notes });
+      // Also hand it to Netlify Forms, which emails the owner. Best effort:
+      // the request is already saved for the admin page either way.
+      fetch('/', {
+        method: 'POST',
+        headers: { 'content-type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ 'form-name': 'proposal', name: f.name, phone: f.phone, email: f.email, kind: f.kind, address: prop.address, acres: (prop.lotSqft / ACRE).toFixed(2), notes: f.notes }),
+      }).catch(() => {});
+      $('.modal', back).innerHTML = `
+        <button class="close" aria-label="Close">×</button>
+        <h2 style="font-size:2rem">Thank you, ${esc(f.name.split(' ')[0])}.</h2>
+        <p class="muted">Paul will reach out to schedule a time to walk the property. If it's urgent, <a href="sms:+16159451614">text (615) 945-1614</a>.</p>
+        <button class="btn block" data-done>Done</button>`;
+    } catch (err) {
+      $('.error', back).textContent = err.message;
+      btn.disabled = false;
+    }
+  });
+  document.body.append(back);
+  $('#pr-name', back).focus();
 }
 
 $('#change-address').addEventListener('click', () => {
@@ -303,14 +368,14 @@ function renderPlan() {
     : nextTier ? `Pick ${nextTier.count} and save ${nextTier.pct}% on add-ons` : '';
 
   // The calculator is only for homes under one acre.
-  if (m.lotSqft > 43560) {
+  if (m.lotSqft > ACRE) {
     $('#summary').innerHTML = `
     <div class="what">
       <div class="label">Over one acre</div>
       <div class="range">By formal proposal</div>
       <div class="lines">We walk larger properties in person and price them individually.</div>
     </div>
-    <button class="btn light" id="save-cta">Request a walkthrough</button>`;
+    <button class="btn light" id="proposal-cta">Request my proposal</button>`;
     return;
   }
   $('#summary').innerHTML = `
@@ -370,6 +435,10 @@ async function save() {
 }
 
 $('#summary').addEventListener('click', async (e) => {
+  if (e.target.closest('#proposal-cta')) {
+    proposalModal({ address: state.place.label, lat: state.place.lat, lon: state.place.lon, lot: state.lot, lotSource: state.lotSource, lotSqft: polygonAreaSqft(state.lot) });
+    return;
+  }
   if (!e.target.closest('#save-cta')) return;
   const btn = e.target.closest('#save-cta');
   btn.disabled = true;
@@ -385,8 +454,12 @@ $('#summary').addEventListener('click', async (e) => {
 });
 
 // ---------- start ----------
-const [{ pricing }, user] = await Promise.all([api('GET', '/api/config'), initHeader()]);
+const [{ pricing, reviews }, user] = await Promise.all([api('GET', '/api/config'), initHeader()]);
 state.pricing = pricing;
+if (reviews?.length) {
+  $('#review-grid').innerHTML = reviews.map((r) => `<figure class="review"><div class="stars" role="img" aria-label="${r.stars} out of 5 stars">${'★'.repeat(r.stars)}</div><blockquote>${esc(r.text)}</blockquote><figcaption><strong>${esc(r.name)}</strong>${r.source ? ` · ${esc(r.source)}` : ''}</figcaption></figure>`).join('');
+  $('#reviews').hidden = false;
+}
 state.user = user;
 renderServices();
 // Coming back from a dashboard link like /?address=...
