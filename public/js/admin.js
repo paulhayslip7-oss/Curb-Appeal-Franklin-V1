@@ -60,7 +60,7 @@ function detailHtml() {
   const tasks = planTasks(p.selections);
   const e = econOf(p);
   // Pre-tick what happens on a routine visit; seasonal work is ticked when it's done.
-  const everyVisit = new Set([...CORE.tasks, ...ADDONS.find((a) => a.key === 'petWaste').tasks]);
+  const everyVisit = new Set([...CORE.tasks.filter((t) => !t.includes('late fall')), ...ADDONS.find((a) => a.key === 'petWaste').tasks]);
   return `
     <p><button class="linkbtn" data-back>← All properties</button></p>
     <div class="dash-head">

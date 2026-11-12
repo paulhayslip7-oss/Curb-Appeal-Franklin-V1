@@ -59,7 +59,7 @@ export const DEFAULT_PRICING = {
 export const CORE = {
   key: 'mowing',
   label: 'Year-round grounds care',
-  blurb: 'Lawn, beds, shrubs, weeds, leaves and mulch — all kept up at every visit, so nothing ever turns into a big job.',
+  blurb: 'Lawn, beds, shrubs, weeds, leaves and mulch, kept up at every visit. Outdoor faucets winterized every fall.',
   cadence: 'Weekly March–November, every other week in winter',
   tasks: [
     'Mow lawn (in season)',
@@ -70,17 +70,18 @@ export const CORE = {
     'Clear leaves & debris',
     'Freshen mulch where thin',
     'Blow off hard surfaces',
+    'Winterize outdoor faucets (late fall)',
   ],
 };
 
 export const ADDONS = [
-  { key: 'petWaste', label: 'Pet waste removal', blurb: 'The whole yard scooped, bagged and taken with us.', cadence: 'Every week, all year', tasks: ['Scoop & remove pet waste'], needsDogs: true },
-  { key: 'pressureWash', label: 'Pressure washing', blurb: 'Driveway, walks, patio and steps washed back to bright.', cadence: 'Quarterly', tasks: ['Pressure wash driveway & walks', 'Pressure wash patio & steps'] },
+  { key: 'petWaste', label: 'Pet waste removal', blurb: 'The whole yard scooped and hauled away.', cadence: 'Every week, all year', tasks: ['Scoop & remove pet waste'], needsDogs: true },
+  { key: 'pressureWash', label: 'Pressure washing', blurb: 'Driveway, walks, patio and steps.', cadence: 'Quarterly', tasks: ['Pressure wash driveway & walks', 'Pressure wash patio & steps'] },
   { key: 'gutters', label: 'Gutter cleaning', blurb: 'Gutters and downspouts cleared and flushed.', cadence: 'Twice a year', tasks: ['Clear gutters', 'Flush downspouts'] },
-  { key: 'aeration', label: 'Aeration & overseeding', blurb: 'Core aeration and overseeding for a thicker lawn next year.', cadence: 'Once a year, in fall', tasks: ['Core-aerate lawn', 'Overseed'] },
-  { key: 'seasonalColor', label: 'Seasonal flowers & planters', blurb: 'Fresh annuals planted in your entry beds and containers each spring and fall, plants included.', cadence: 'Twice a year', tasks: ['Plant seasonal flowers', 'Refresh containers & planters'] },
-  { key: 'windows', label: 'Exterior window washing', blurb: 'Every reachable exterior pane, sill and screen washed by hand.', cadence: 'Twice a year', tasks: ['Wash exterior windows', 'Wipe sills & rinse screens'] },
-  { key: 'patioDetail', label: 'Porch & patio detailing', blurb: 'Porches and patios swept, cobwebs cleared, furniture wiped down and set straight.', cadence: 'Monthly', tasks: ['Sweep porches & patio', 'Clear cobwebs & wipe furniture'] },
+  { key: 'aeration', label: 'Aeration & overseeding', blurb: 'For a thicker lawn next year.', cadence: 'Once a year, in fall', tasks: ['Core-aerate lawn', 'Overseed'] },
+  { key: 'seasonalColor', label: 'Seasonal flowers & planters', blurb: 'Fresh annuals in your beds and containers, plants included.', cadence: 'Twice a year', tasks: ['Plant seasonal flowers', 'Refresh containers & planters'] },
+  { key: 'windows', label: 'Exterior window washing', blurb: 'Exterior panes, sills and screens washed by hand.', cadence: 'Twice a year', tasks: ['Wash exterior windows', 'Wipe sills & rinse screens'] },
+  { key: 'patioDetail', label: 'Porch & patio detailing', blurb: 'Swept, cobwebs cleared, furniture wiped down.', cadence: 'Monthly', tasks: ['Sweep porches & patio', 'Clear cobwebs & wipe furniture'] },
   { key: 'lawnTreatment', label: 'Lawn fertilization & weed control', blurb: 'Seasonal fertilizer and weed control applications.', cadence: '7 rounds a year', tasks: ['Apply seasonal lawn treatment'] },
 ];
 

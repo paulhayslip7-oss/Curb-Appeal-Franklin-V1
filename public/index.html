@@ -5,18 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#0e2216">
   <title>Curb Appeal Franklin — Private, year-round grounds care</title>
-  <meta name="description" content="Type your address and see a budgetary monthly price for all-inclusive, year-round grounds care in Franklin, TN — measured from aerial imagery in about a minute.">
+  <meta name="description" content="Type your address and see a budgetary monthly price for all-inclusive, year-round grounds care in Franklin, TN — for high-end homes under one acre.">
   <link rel="stylesheet" href="/vendor/leaflet/leaflet.css">
   <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
   <header class="site-header">
     <div class="container">
-      <a class="logo" href="/"><span class="logo-mark" aria-hidden="true"></span>Curb Appeal Franklin</a>
+      <a class="logo" href="/" aria-label="Curb Appeal Franklin"><span class="logo-script">Curb Appeal</span><span class="logo-sub">Franklin</span></a>
       <nav>
-        <a class="hide-sm" href="#why">Why year-round</a>
-        <a class="hide-sm" href="#services">Services</a>
         <a class="hide-sm" href="#about">About</a>
+        <a class="hide-sm" href="#estimate">Pricing</a>
+        <a class="hide-sm" href="#services">Services</a>
         <a class="hide-sm" href="sms:+16159451614">Text (615) 945-1614</a>
         <a class="btn ghost small" id="account-link" href="/portal.html">Client sign in</a>
       </nav>
@@ -27,21 +27,18 @@
     <div class="hero">
       <div class="container">
         <div>
-        <div class="eyebrow">Private grounds care · Franklin, Tennessee</div>
-        <h1>We stay on top of your yard, so it never <em>gets away</em> from you.</h1>
-        <p class="lead">Lawn, beds, shrubs, leaves and mulch, kept up at every visit, all year, under one annual agreement. Enter your address to see what that costs for your home.</p>
-        <form class="address-form" id="address-form">
-          <input id="address" name="address" autocomplete="off" placeholder="Start typing your street address" aria-label="Your street address" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="address-suggestions" required>
-          <ul class="suggest" id="address-suggestions" role="listbox" aria-label="Matching addresses" hidden></ul>
-          <button class="btn" type="submit">Measure my property</button>
-        </form>
-        <div class="error" id="address-error" role="alert"></div>
-        <p class="hero-text">Rather talk it through? <a href="sms:+16159451614">Text (615) 945-1614</a></p>
-        <ul class="hero-points">
-          <li>On your property all twelve months</li>
-          <li>One fixed monthly price</li>
-          <li>A private dashboard for your home</li>
-        </ul>
+          <div class="eyebrow">Private grounds care · Franklin, Tennessee</div>
+          <h1>We stay on top of your yard, so it never <em>gets away</em> from you.</h1>
+          <p class="lead">Year-round care for Franklin's finest homes. One agreement, one monthly price.</p>
+          <div class="hero-cta">
+            <a class="btn light" href="#estimate">See my monthly price</a>
+            <a class="btn outline" href="sms:+16159451614">Text (615) 945-1614</a>
+          </div>
+          <ul class="hero-points">
+            <li>Specializing in high-end properties</li>
+            <li>On your property all year</li>
+            <li>A private dashboard for your home</li>
+          </ul>
         </div>
         <div class="plat" aria-hidden="true">
           <svg viewBox="0 0 420 380" xmlns="http://www.w3.org/2000/svg" font-family="'Plex Mono', ui-monospace, monospace" font-size="9" fill="#141c17">
@@ -84,6 +81,38 @@
       </div>
     </div>
 
+    <section id="about">
+      <div class="container about">
+        <figure class="about-photo">
+          <img src="/img/about.jpg" width="1400" height="933" alt="The owner and his wife Britney, smiling in a grassy field and holding their Bernese Mountain Dog between them." loading="lazy">
+        </figure>
+        <div class="about-body">
+          <div class="eyebrow">About us</div>
+          <h2>In Franklin since 1999.</h2>
+          <p class="about-lead">I grew up in Founders Pointe, before Westhaven was even an idea, and I've watched this town grow ever since.</p>
+          <p>I'm married to my high school sweetheart, Britney, a physician assistant in dermatology. Six years in, our three-year-old Bernese Mountain Dog keeps our hands full.</p>
+          <p>I have eight years in lawn care. I built and sold my first company, Hayslip Lawn Care, thinking corporate America was the path for me. Almost ten years later, I'm glad to be back in a service business, with the best communication and the best quality in the industry.</p>
+          <p>As with anything, you get what you pay for.</p>
+          <p class="about-sign">Owner, Curb Appeal Franklin &nbsp;·&nbsp; <a href="sms:+16159451614">Text (615) 945-1614</a></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="estimate" class="section-alt">
+      <div class="container narrow-block">
+        <div class="eyebrow">Your monthly price</div>
+        <h2>See what it costs for your home.</h2>
+        <p class="muted">Enter your address. We measure the property from above and price your plan in about a minute.</p>
+        <form class="address-form on-light" id="address-form">
+          <input id="address" name="address" autocomplete="off" placeholder="Start typing your street address" aria-label="Your street address" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="address-suggestions" required>
+          <ul class="suggest" id="address-suggestions" role="listbox" aria-label="Matching addresses" hidden></ul>
+          <button class="btn" type="submit">Measure my property</button>
+        </form>
+        <div class="error" id="address-error" role="alert"></div>
+        <p class="acre-note"><strong>For homes under one acre.</strong> Larger estates and commercial properties are walked in person for a formal proposal. <a href="sms:+16159451614">Text (615) 945-1614</a> to arrange one.</p>
+      </div>
+    </section>
+
     <section id="estimator" hidden aria-live="polite">
       <div class="container">
         <div class="est-head">
@@ -119,50 +148,49 @@
             <div id="addons"></div>
             <div class="summary" id="summary"></div>
             <p class="fine">Questions about your estimate? <a href="sms:+16159451614">Text (615) 945-1614</a>.</p>
-            <p class="fine" style="margin-top:6px">This is a budgetary range from aerial measurements — not a final quote. Save it and we'll schedule a free walkthrough to confirm your fixed monthly price in person.</p>
+            <p class="fine" style="margin-top:6px">A budgetary range, not a final quote. Your fixed price is confirmed at a free walkthrough.</p>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="why" class="section-alt">
+    <section id="why">
       <div class="container">
         <div class="eyebrow">Why year-round</div>
-        <h2>Big cleanup jobs only exist because no one was keeping up.</h2>
-        <p class="muted" style="max-width:720px">A weekend of weed pulling. A truckload of leaves. Shrubs that need cutting back by half. Those jobs are what happens when a yard is left alone for months. We're at your home all year, so the small things get handled while they're still small.</p>
+        <h2>Big cleanups only happen when no one is keeping up.</h2>
         <div class="versus">
           <div class="vs old">
             <h3>The usual way</h3>
             <ul>
-              <li>A mowing crew that only mows</li>
-              <li>Weeds take over the beds by July</li>
-              <li>A separate quote every time something needs doing</li>
-              <li>One huge leaf removal bill in December</li>
-              <li>No idea what was done, or whether anyone came</li>
+              <li>A crew that only mows</li>
+              <li>Weeds take over by July</li>
+              <li>A new quote for every job</li>
+              <li>One huge leaf bill in December</li>
+              <li>A burst spigot nobody winterized</li>
             </ul>
           </div>
           <div class="vs new">
             <h3>The Curb Appeal way</h3>
             <ul>
-              <li>One crew that looks after the whole property</li>
-              <li>Weeds pulled at every visit, before they spread</li>
-              <li>Shrubs kept in shape, mulch topped up, leaves cleared as they fall</li>
-              <li>One fixed monthly price on an annual agreement</li>
-              <li>A report with photos after every visit, on your own dashboard</li>
+              <li>One crew for the whole property</li>
+              <li>Weeds, shrubs, leaves and mulch at every visit</li>
+              <li>Hose spigots winterized every fall</li>
+              <li>One fixed monthly price, by annual agreement</li>
+              <li>A photo report after every visit</li>
             </ul>
           </div>
         </div>
       </div>
     </section>
 
-    <section id="how">
+    <section id="how" class="section-alt">
       <div class="container">
         <div class="eyebrow">How it works</div>
-        <h2>From your address to a price you can plan around</h2>
+        <h2>Three steps.</h2>
         <div class="steps">
-          <div class="step"><h3>We map your property</h3><p class="muted">Enter your address and we pull an aerial view, outline your lot, and measure the lawn, plantings and hard surfaces.</p></div>
-          <div class="step"><h3>You build your plan</h3><p class="muted">Your plan already covers the lawn, weeds, shrubs, leaves and mulch. Add extras such as seasonal flowers, window washing or pressure washing if you'd like them — the monthly price updates as you go.</p></div>
-          <div class="step"><h3>We confirm in person</h3><p class="muted">Save your estimate and we'll walk the property with you, confirm the details, and lock in one fixed monthly price on an annual agreement.</p></div>
+          <div class="step"><h3>We measure your property</h3><p class="muted">Enter your address for a budgetary monthly range.</p></div>
+          <div class="step"><h3>We walk it with you</h3><p class="muted">A free visit to confirm the details and your fixed price.</p></div>
+          <div class="step"><h3>You sign, we start</h3><p class="muted">Sign your annual agreement online. We take it from there.</p></div>
         </div>
       </div>
     </section>
@@ -171,23 +199,21 @@
       <div class="container split">
         <div>
           <div class="eyebrow">A dashboard dedicated to your home</div>
-          <h2>You'll never wonder what we did — or whether we came.</h2>
-          <p class="muted">Most service companies leave you guessing. Every Curb Appeal client gets a private dashboard that shows exactly what the job is and exactly what was done.</p>
+          <h2>You'll never wonder what we did, or whether we came.</h2>
           <ul class="ticks">
-            <li><strong>A report after every visit</strong> — the checklist we worked from, what was completed, and anything we skipped and why.</li>
-            <li><strong>Before &amp; after photos</strong> — time-stamped, on your account, for every visit.</li>
-            <li><strong>Your plan in plain English</strong> — what's included, how often, and your fixed monthly price.</li>
-            <li><strong>A direct line</strong> — leave a note for the crew ("gate code changed", "skip next week") right from the dashboard.</li>
+            <li><strong>A report after every visit.</strong> What was done, and anything we skipped and why.</li>
+            <li><strong>Before and after photos.</strong> Every visit, on your account.</li>
+            <li><strong>A direct line.</strong> Leave the crew a note, or text us.</li>
           </ul>
         </div>
         <div class="visit sample" aria-label="Sample visit report">
           <span class="sample-tag">SAMPLE</span>
-          <div class="visit-head"><h3>Thursday, June 12</h3><span class="visit-meta">48 min on site · Crew: Paul · 6 of 7 tasks</span></div>
+          <div class="visit-head"><h3>Thursday, June 12</h3><span class="visit-meta">48 min on site · 6 of 7 tasks</span></div>
           <ul class="checks">
             <li>Mow lawn</li><li>Edge walks, driveway &amp; beds</li><li>Pull weeds in beds &amp; hard surfaces</li><li>Trim &amp; tidy shrubs</li><li>Clear leaves &amp; debris</li><li>Blow off hard surfaces</li>
-            <li class="skip">Freshen mulch where thin<span class="why">Beds too wet after rain — first thing next visit</span></li>
+            <li class="skip">Freshen mulch where thin<span class="why">Beds too wet after rain. First thing next visit.</span></li>
           </ul>
-          <div class="note">Sprinkler head by the mailbox is leaking — flagged it with a marker so it's easy to find.</div>
+          <div class="note">Sprinkler head by the mailbox is leaking. Flagged it with a marker so it's easy to find.</div>
           <div class="photos">
             <figure><div class="swatch"></div><figcaption>Before</figcaption></figure>
             <figure><div class="swatch after"></div><figcaption>After</figcaption></figure>
@@ -197,36 +223,21 @@
       </div>
     </section>
 
-    <section id="about" class="section-alt">
-      <div class="container about">
-        <div>
-          <div class="eyebrow">About</div>
-          <h2>Twenty-seven years in Franklin, and counting.</h2>
-        </div>
-        <div class="about-body">
-          <p class="about-lead">I grew up in Founders Pointe, back before Westhaven was even an idea.</p>
-          <p>I've watched this town grow up around me, one neighborhood at a time, and I've seen how much pride people here take in their homes. I've also seen how hard it is to find someone who will simply look after the outside of one properly, week in and week out, without being chased.</p>
-          <p>That is why Curb Appeal works the way it does. One agreement, one price, and a crew on your property all year, so the small things are handled before they become big ones. After every visit you can see exactly what was done, with photographs, on a dashboard that belongs to your home.</p>
-          <p>These are my neighbors' homes. I intend to treat them that way. If you ever have a question, you won't get a call center. You'll get me.</p>
-          <p class="about-sign">Owner, Curb Appeal Franklin &nbsp;·&nbsp; <a href="sms:+16159451614">Text (615) 945-1614</a></p>
-        </div>
-      </div>
-    </section>
-
-    <section id="services">
+    <section id="services" class="section-alt">
       <div class="container">
-        <div class="eyebrow">The plan, and what you can add</div>
-        <h2>One plan keeps the grounds. The extras look after the rest.</h2>
+        <div class="eyebrow">Services</div>
+        <h2>One plan for the grounds. Extras for the rest.</h2>
         <div class="service-grid" id="service-grid"></div>
-        <p style="margin-top:32px"><a class="btn" href="#address">See my monthly price</a></p>
+        <p style="margin-top:32px"><a class="btn" href="#estimate">See my monthly price</a></p>
       </div>
     </section>
   </main>
 
   <footer class="site-footer">
     <div class="container">
-      <strong style="color:#fff">Curb Appeal Franklin</strong> Locally owned in Franklin, Tennessee · <a href="sms:+16159451614">Text (615) 945-1614</a> · <a href="tel:+16159451614">Call</a>
-      <p class="small" style="margin:10px 0 0">Online prices are budgetary ranges based on aerial measurements. Your fixed monthly price is confirmed after a free on-site walkthrough. Aerial imagery: TDOT Aerial Surveys / Esri. Building outlines: FEMA USA Structures.</p>
+      <strong class="logo-script" style="color:#fff">Curb Appeal</strong>
+      Franklin, Tennessee · Specializing in high-end properties · <a href="sms:+16159451614">Text (615) 945-1614</a> · <a href="tel:+16159451614">Call</a>
+      <p class="small" style="margin:12px 0 0">Online prices are budgetary ranges for homes under one acre. Aerial imagery: TDOT Aerial Surveys / Esri. Building outlines: FEMA. Parcel lines: Williamson County.</p>
     </div>
   </footer>
 

@@ -29,9 +29,12 @@ function stageHtml(status, agreement) {
 
 function planHtml(p) {
   const isClient = p.status === 'client';
+  const overAcre = p.measurements.lotSqft > 43560;
   const price = p.finalMonthly
     ? `<div class="price-big num">${money(p.finalMonthly)} <small>per month · fixed</small></div>`
-    : `<div class="price-big num">${money(p.quote.low)}–${money(p.quote.high)} <small>per month · budgetary range</small></div>`;
+    : overAcre
+      ? '<div class="price-big" style="font-size:2.2rem">By formal proposal</div>'
+      : `<div class="price-big num">${money(p.quote.low)}–${money(p.quote.high)} <small>per month · budgetary range</small></div>`;
   const lines = [p.quote.core, ...p.quote.addons];
   return `<div class="card">
     <div style="display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap">
@@ -40,7 +43,7 @@ function planHtml(p) {
     </div>
     ${price}
     <p class="small muted" style="margin:6px 0 0">${p.finalMonthly ? '12 equal payments on your annual agreement. Same price every month.' : "We'll confirm your fixed monthly price at your free walkthrough."}</p>
-    <ul class="plan-list">${lines.map((l) => `<li><span><strong>${esc(l.label)}</strong><br><span class="cad">${esc(l.cadence)}</span></span>${p.finalMonthly ? '' : `<span class="num muted">${money(l.monthly)}/mo</span>`}</li>`).join('')}</ul>
+    <ul class="plan-list">${lines.map((l) => `<li><span><strong>${esc(l.label)}</strong><br><span class="cad">${esc(l.cadence)}</span></span>${p.finalMonthly || overAcre ? '' : `<span class="num muted">${money(l.monthly)}/mo</span>`}</li>`).join('')}</ul>
     ${isClient ? '' : `<p style="margin:14px 0 0"><a class="btn ghost small" href="/?address=${encodeURIComponent(p.address)}">Re-measure or change add-ons</a></p>`}
   </div>`;
 }

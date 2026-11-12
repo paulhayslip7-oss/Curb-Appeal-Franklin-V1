@@ -150,8 +150,9 @@ async function parcelAt(lon, lat) {
       const ring = raw.slice(0, -1);
       const P = projector(lat, lon);
       const sqm = ringAreaM(ring.map(([x, y]) => P.toM(x, y)));
-      // Skip slivers and common-area / acreage tracts: 1,500 sq ft to 5 acres.
-      if (sqm < 140 || sqm > 20234) continue;
+      // Skip slivers. Large tracts are kept on purpose: anything over an acre
+      // is routed to a formal proposal instead of an online price.
+      if (sqm < 140 || sqm > 2e6) continue;
       if (!best || sqm < best.sqm) best = { ring, sqm }; // the smallest parcel under the point is the house lot
     }
   }

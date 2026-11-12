@@ -108,8 +108,8 @@ $('#address-form').addEventListener('submit', async (e) => {
 }
 
 $('#change-address').addEventListener('click', () => {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-  $('#address').focus();
+  $('#estimate').scrollIntoView({ behavior: 'smooth' });
+  $('#address').focus({ preventScroll: true });
   $('#address').select();
 });
 
@@ -118,10 +118,10 @@ function showEstimator() {
   $('#estimator').hidden = false;
   $('#est-address').textContent = state.place.label;
   $('#map-tip').innerHTML = state.place.precision === 'street'
-    ? '<strong>We found your street but not your exact house.</strong> Drag the white corners so the outline sits on your property.'
+    ? '<strong>We found your street but not your exact house.</strong> Drag the corners onto your property.'
     : state.lotSource === 'parcel'
-      ? '<strong>This is your recorded property line</strong>, from the Williamson County parcel map. You can still drag a corner if part of the lot isn\'t ours to look after.'
-      : '<strong>Not quite your property line?</strong> Drag the white corners to fix it — the numbers update as you go.';
+      ? '<strong>Your recorded property line</strong>, from the county parcel map. Drag a corner to adjust.'
+      : '<strong>This outline is our estimate.</strong> Drag the corners to match your property line.';
   if (L.Browser.mobile) $('#map-tip').insertAdjacentHTML('beforeend', ' Use two fingers to move the map.');
   if (map) map.remove();
   // On phones one finger scrolls the page; two fingers move or zoom the map.
@@ -282,7 +282,7 @@ function renderPlan() {
     </div>
     <div class="small muted">${esc(CORE.cadence)} · about ${q.core.visitsPerYear} visits a year</div>
     <ul>${CORE.tasks.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>
-    <p class="small" style="margin:10px 0 0"><strong>No separate bills</strong> for weed pulling, shrub trimming, mulch or leaf cleanup — it's all part of every visit.</p>`;
+    <p class="small" style="margin:10px 0 0"><strong>No separate bills</strong> for weeds, shrubs, mulch, leaves or winterizing your hose spigots.</p>`;
 
   $('#addons').innerHTML = ADDONS.filter((a) => pricing.addons[a.key]?.enabled).map((a) => {
     const on = Boolean(selections.addons[a.key]);
@@ -302,11 +302,22 @@ function renderPlan() {
     ? `Bundle discount: ${q.discountPct}% off add-ons`
     : nextTier ? `Pick ${nextTier.count} and save ${nextTier.pct}% on add-ons` : '';
 
+  // The calculator is only for homes under one acre.
+  if (m.lotSqft > 43560) {
+    $('#summary').innerHTML = `
+    <div class="what">
+      <div class="label">Over one acre</div>
+      <div class="range">By formal proposal</div>
+      <div class="lines">We walk larger properties in person and price them individually.</div>
+    </div>
+    <button class="btn light" id="save-cta">Request a walkthrough</button>`;
+    return;
+  }
   $('#summary').innerHTML = `
     <div class="what">
       <div class="label">Your budgetary range</div>
       <div class="range num">${money(q.low)}–${money(q.high)} <small>per month</small></div>
-      <div class="lines">12 equal payments, all year · ${esc(CORE.label)}${count ? ` + ${count} add-on${count > 1 ? 's' : ''}` : ''}${q.discountPct ? ` · ${q.discountPct}% bundle discount` : ''}</div>
+      <div class="lines">12 equal payments${count ? ` · ${count} extra${count > 1 ? 's' : ''}` : ''}${q.discountPct ? ` · ${q.discountPct}% bundle discount` : ''}</div>
     </div>
     <button class="btn light" id="save-cta">${state.user ? 'Save to my dashboard' : 'Save my estimate'}</button>`;
 }
@@ -364,7 +375,7 @@ $('#summary').addEventListener('click', async (e) => {
   btn.disabled = true;
   await save();
   if (!state.user) {
-    state.user = await authModal('signup', { title: 'Save your estimate', intro: "Create your account and we'll reach out to schedule a free walkthrough. Your estimate will be waiting in your dashboard." });
+    state.user = await authModal('signup', { title: 'Save your estimate', intro: "Create your account and we'll be in touch to schedule your free walkthrough." });
   }
   btn.disabled = false;
   if (state.user) {
