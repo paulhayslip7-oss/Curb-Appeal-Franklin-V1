@@ -38,6 +38,15 @@ test('add-ons are priced from measurements and annualised', () => {
   assert.equal(q.monthly, Math.round(q.core.monthly + addons * 0.92));
 });
 
+test('premium extras: flowers, windows and porch detailing', () => {
+  const q = computeQuote(DEFAULT_PRICING, yard, { addons: { seasonalColor: true, windows: true, patioDetail: true } });
+  const by = Object.fromEntries(q.addons.map((x) => [x.key, x]));
+  assert.equal(by.seasonalColor.perVisit, 225); // minimum; $150 + 210 sq ft x $0.25 = $202.50
+  assert.equal(by.windows.perVisit, 275); // $150 + 2,500 sq ft x $0.05
+  assert.equal(by.patioDetail.perVisit, 45);
+  assert.equal(DEFAULT_PRICING.addons.binCleaning, undefined);
+});
+
 test('work that is now part of every visit is no longer sold separately', () => {
   for (const key of ['shrubs', 'bedWeeding', 'mulch', 'leafCleanup']) assert.equal(DEFAULT_PRICING.addons[key], undefined);
   const q = computeQuote(DEFAULT_PRICING, yard, { addons: { shrubs: true, mulch: true } });
@@ -65,7 +74,7 @@ test('default prices clear the crew-hour target on typical Franklin yards', () =
     { lawnSqft: 16000, shrubCount: 35, bedSqft: 700, hardscapeSqft: 1800, buildingSqft: 3200 },
   ];
   for (const m of yards) {
-    for (const sel of [{}, { addons: { petWaste: true, pressureWash: true, gutters: true, aeration: true, binCleaning: true } }]) {
+    for (const sel of [{}, { addons: { petWaste: true, pressureWash: true, gutters: true, aeration: true, seasonalColor: true, windows: true, patioDetail: true } }]) {
       const e = jobEconomics(DEFAULT_PRICING, m, sel, computeQuote(DEFAULT_PRICING, m, sel).monthly);
       assert.ok(e.onTarget, 'only $' + e.revenuePerHour + ' per crew hour on ' + m.lawnSqft + ' sq ft');
       assert.ok(e.grossMarginPct >= 55 && e.grossMarginPct <= 75);

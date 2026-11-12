@@ -10,6 +10,7 @@ const state = {
   pricing: null,
   place: null, // { label, lat, lon, precision, buildings }
   lot: [], // [[lon, lat], ...]
+  lotSource: 'estimate', // 'parcel' once we have the recorded property line
   measured: null, // straight from the analyzer
   overrides: {}, // numbers the visitor typed in themselves
   selections: { addons: {}, dogs: 1 },
@@ -40,6 +41,7 @@ $('#address-form').addEventListener('submit', async (e) => {
     savedEstimate.clear();
     state.place = place;
     state.lot = place.lot;
+    state.lotSource = place.lotSource || 'estimate';
     state.overrides = {};
     state.source = await pickSource(place.lon, place.lat);
     showEstimator();
@@ -47,7 +49,7 @@ $('#address-form').addEventListener('submit', async (e) => {
     errorEl.textContent = err.message;
   } finally {
     btn.disabled = false;
-    btn.textContent = 'Measure my yard';
+    btn.textContent = 'Measure my property';
   }
 });
 // ---------- address suggestions while typing ----------
@@ -117,9 +119,13 @@ function showEstimator() {
   $('#est-address').textContent = state.place.label;
   $('#map-tip').innerHTML = state.place.precision === 'street'
     ? '<strong>We found your street but not your exact house.</strong> Drag the white corners so the outline sits on your property.'
-    : '<strong>Not quite your property line?</strong> Drag the white corners to fix it — the numbers update as you go.';
+    : state.lotSource === 'parcel'
+      ? '<strong>This is your recorded property line</strong>, from the Williamson County parcel map. You can still drag a corner if part of the lot isn\'t ours to look after.'
+      : '<strong>Not quite your property line?</strong> Drag the white corners to fix it — the numbers update as you go.';
+  if (L.Browser.mobile) $('#map-tip').insertAdjacentHTML('beforeend', ' Use two fingers to move the map.');
   if (map) map.remove();
-  map = L.map('map', { zoomControl: true, scrollWheelZoom: false, attributionControl: true });
+  // On phones one finger scrolls the page; two fingers move or zoom the map.
+  map = L.map('map', { zoomControl: true, scrollWheelZoom: false, attributionControl: true, dragging: !L.Browser.mobile });
   aerialLayer(state.source).addTo(map);
   lotLayer = L.polygon([], { color: '#fff', weight: 3, fill: false, dashArray: '6 6' }).addTo(map);
   handleLayer = L.layerGroup().addTo(map);
@@ -134,14 +140,15 @@ const toLatLng = ([lon, lat]) => [lat, lon];
 function drawLot() {
   lotLayer.setLatLngs(state.lot.map(toLatLng));
   handleLayer.clearLayers();
-  const icon = (cls) => L.divIcon({ className: '', html: `<div class="vertex ${cls}"></div>`, iconSize: [16, 16], iconAnchor: [8, 8] });
+  // A 36px touch target around each small visible handle.
+  const icon = (cls) => L.divIcon({ className: '', html: `<div class="vx"><div class="vertex ${cls}"></div></div>`, iconSize: [36, 36], iconAnchor: [18, 18] });
   state.lot.forEach((pt, i) => {
     const m = L.marker(toLatLng(pt), { draggable: true, icon: icon(''), title: 'Drag to adjust. Double-click to remove.', keyboard: false }).addTo(handleLayer);
     m.on('drag', (e) => {
       state.lot[i] = [e.latlng.lng, e.latlng.lat];
       lotLayer.setLatLngs(state.lot.map(toLatLng));
     });
-    m.on('dragend', () => { drawLot(); analyze(); });
+    m.on('dragend', () => { state.lotSource = 'estimate'; drawLot(); analyze(); });
     m.on('dblclick', (e) => {
       L.DomEvent.stop(e);
       if (state.lot.length > 3) { state.lot.splice(i, 1); drawLot(); analyze(); }
@@ -270,7 +277,7 @@ function renderPlan() {
 
   $('#core-card').innerHTML = `
     <div style="display:flex;justify-content:space-between;gap:12px;align-items:baseline">
-      <strong style="font:700 1.25rem var(--serif);letter-spacing:-.02em">${esc(CORE.label)}</strong>
+      <strong style="font:500 1.9rem/1.1 var(--serif)">${esc(CORE.label)}</strong>
       <span class="price num">${money(q.core.monthly)}<span class="small muted">/mo</span></span>
     </div>
     <div class="small muted">${esc(CORE.cadence)} · about ${q.core.visitsPerYear} visits a year</div>
@@ -334,7 +341,7 @@ function queueSave() {
 async function save() {
   clearTimeout(saveTimer);
   if (!state.place || !state.measured) return null;
-  const payload = { lot: state.lot, measurements: measurements(), selections: state.selections };
+  const payload = { lot: state.lot, lotSource: state.lotSource, measurements: measurements(), selections: state.selections };
   const existing = savedEstimate.get();
   try {
     if (existing?.id) {

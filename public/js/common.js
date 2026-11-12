@@ -70,7 +70,7 @@ export function authModal(mode = 'login', copy = {}) {
       back.innerHTML = `
         <div class="modal" role="dialog" aria-modal="true" aria-labelledby="auth-title">
           <button class="close" aria-label="Close">×</button>
-          <h2 id="auth-title" style="font-size:1.5rem">${esc(signup ? copy.title || 'Create your account' : 'Welcome back')}</h2>
+          <h2 id="auth-title" style="font-size:2.1rem">${esc(signup ? copy.title || 'Create your account' : 'Welcome back')}</h2>
           <p class="muted small">${esc(signup ? copy.intro || 'Your dashboard keeps your estimate, your plan, and a record of every visit.' : 'Sign in to your Curb Appeal dashboard.')}</p>
           <form novalidate>
             ${signup ? `

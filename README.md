@@ -12,14 +12,24 @@ A visitor types their address and, in about a minute, sees their property from a
 | `/portal.html` | Clients & leads | Plan and price, next visit, visit reports (checklist, crew notes, before/after photos), notes to the crew |
 | `/admin.html` | You | Leads pipeline, contact details, confirm price, convert to client, log visits with photos, edit all pricing |
 
+## The annual agreement (e-signature)
+
+After the walkthrough, set the confirmed monthly price on the property in admin and press **Send for signature**. The client sees the agreement on their dashboard, reads it, types their full legal name, ticks a consent box and signs. Signing makes them an active client.
+
+What is recorded with each signature: the typed name, date and time, the account's email, IP address and browser, and a fingerprint (SHA-256) of the exact text that was signed. The signed text is frozen; later changes to prices or terms never alter it. Both you and the client can read it at any time, and the client can print it or save it as a PDF.
+
+The wording of the terms is yours to edit under **Admin → Agreement**. **The default terms are a plain-English starting point, not legal advice. Have a Tennessee attorney review them before relying on them.**
+
+Clients can also text the business number from the home page, the estimate, the agreement and their dashboard. To change that number, edit `public/js/agreement.js` and the `sms:` links in `public/index.html`.
+
 ## How the measuring works
 
 1. **Find the house** — Tennessee's statewide address points (rooftop-accurate), with the US Census geocoder as a fallback.
 2. **Outline the buildings** — FEMA's public "USA Structures" footprints.
-3. **Guess the lot** — squared up to the house, from the street to a typical back-yard depth, stopping halfway to each neighbour. *There is no free parcel-boundary data for Williamson County, so this is an educated guess — the visitor can drag the corners to fix it.*
+3. **Find the lot** — the recorded parcel line from Williamson County's parcel map, as published by the City of Franklin (covers the city, its growth boundary and Grassland). Outside that coverage the lot is an educated guess: squared up to the house, from the street to a typical back-yard depth, stopping halfway to each neighbour. Either way the visitor can drag the corners.
 4. **Classify the aerial photo** (TDOT 6-inch imagery; Esri as fallback) — pavement, shrubs/plantings, and house are picked out; what's left is lawn.
 
-It is a budgetary tool, not a survey. Expect the lawn figure to be in the right ballpark and the shrub count to be rough; both can be corrected by the visitor on the page and by you after the walkthrough. Known weak spots: corner lots and cul-de-sacs (lot shape), dark asphalt or gravel driveways (read as lawn), and winter imagery (bare trees aren't counted).
+It is a budgetary tool, not a survey. Expect the lawn figure to be in the right ballpark and the shrub count to be rough; both can be corrected by the visitor on the page and by you after the walkthrough. Known weak spots: addresses outside the parcel coverage (lot shape is a guess), dark asphalt or gravel driveways (read as lawn), and winter imagery (bare trees aren't counted).
 
 ## Pricing
 
@@ -29,7 +39,7 @@ All numbers live in **Admin → Pricing** and can be changed without touching co
 
 Base plan per visit = lawn (by lawn size) + bed & shrub upkeep (by shrub count and bed size). Yearly = per visit × visits + the year's mulch, split into 12 payments. Example with the defaults: 8,000 sq ft lawn, 15 shrubs, 210 sq ft of beds ≈ $94 a visit ≈ **$350/month**; a half-acre property with a 16,000 sq ft lawn ≈ **$585/month**.
 
-Optional extras (pet waste, pressure washing, gutters, aeration, bin cleaning) are priced per visit × visits per year ÷ 12; weekly pet waste removal adds about $87/month.
+Optional extras (pet waste, pressure washing, gutters, aeration, seasonal flowers, exterior window washing, porch and patio detailing) are priced per visit × visits per year ÷ 12; weekly pet waste removal adds about $87/month.
 
 **Priced for a crew, not a solo operator.** The defaults aim for about $90–100 of revenue per crew hour including drive time, which keeps crew cost near a third of revenue at roughly $31/hour loaded. Admin shows a private "Does this job pay?" check on every property (estimated crew hours, crew cost, what's left, revenue per crew hour) and flags jobs below your target. The crew-cost assumptions are editable under Admin → Pricing and are never sent to customers.
 

@@ -2,9 +2,11 @@
 // It is written against web-standard Request/Response so the same code runs
 // under the plain Node server (server.js) and as a Netlify Function.
 
+import crypto from 'node:crypto';
 import { lookupAddress, suggestAddresses } from './geo.js';
 import { createToken, hashPassword, newId, readToken, safeEqual, userIdFor, verifyPassword } from './auth.js';
 import { ADDONS, DEFAULT_PRICING, computeQuote, mergePricing, planTasks } from '../public/js/pricing.js';
+import { DEFAULT_TERMS, agreementText } from '../public/js/agreement.js';
 
 export const STATUSES = ['estimate', 'lead', 'contacted', 'walkthrough', 'client', 'lost'];
 const COOKIE = 'ca_session';
@@ -176,12 +178,14 @@ export function createApp(store, env = {}) {
         lat: numIn(b.lat, -90, 90),
         lon: numIn(b.lon, -180, 180),
         lot,
+        lotSource: b.lotSource === 'parcel' ? 'parcel' : 'estimate',
         measurements,
         selections,
         quote: computeQuote(await getPricing(), measurements, selections),
         finalMonthly: null,
         nextVisit: null,
         adminNotes: '',
+        agreement: null,
         messages: [],
         createdAt: now,
       };
@@ -197,6 +201,7 @@ export function createApp(store, env = {}) {
       // Once someone is a client their plan is set by the owner, not the estimator.
       if (p.status === 'client') bad('This property is on an active plan — message us to change it.', 409);
       if (b.lot) p.lot = cleanRing(b.lot) || p.lot;
+      if (b.lotSource) p.lotSource = b.lotSource === 'parcel' ? 'parcel' : 'estimate';
       if (b.measurements) p.measurements = cleanMeasurements(b.measurements);
       if (b.selections) p.selections = cleanSelections(b.selections);
       p.quote = computeQuote(await getPricing(), p.measurements, p.selections);
@@ -369,6 +374,88 @@ export function createApp(store, env = {}) {
       for (const ph of v.photos || []) await store.delete(`photos/${id}/${ph.id}`);
       await store.delete(`visits/${id}/${visitId}`);
       return json({ ok: true });
+    }],
+
+    // ---------- annual agreement (e-signature) ----------
+    ['GET', '/api/admin/agreement-terms', async (req) => {
+      await requireAdmin(req);
+      return json({ terms: (await store.get('config/agreement'))?.terms || DEFAULT_TERMS });
+    }],
+
+    ['PUT', '/api/admin/agreement-terms', async (req) => {
+      await requireAdmin(req);
+      const b = await body(req);
+      const terms = b.reset ? DEFAULT_TERMS : str(b.terms, 12000);
+      if (terms.length < 40) bad('The terms look too short to be an agreement.');
+      await store.set('config/agreement', { terms });
+      return json({ terms });
+    }],
+
+    // Owner sends the agreement. It is frozen at this moment: the price,
+    // services and terms the client signs are exactly what is stored here.
+    ['POST', '/api/admin/properties/:id/agreement', async (req, url, { id }) => {
+      await requireAdmin(req);
+      const b = await body(req);
+      const p = (await getProperty(id)) || bad('Property not found.', 404);
+      if (p.agreement?.status === 'signed') bad('This agreement is already signed.', 409);
+      const user = p.userId ? await store.get(`users/${p.userId}`) : null;
+      if (!user) bad('This property has no client account yet, so there is no one to sign.');
+      if (!p.finalMonthly) bad('Set the confirmed monthly price first.');
+      const startDate = str(b.startDate, 10);
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(startDate)) bad('Pick the start date.');
+      const doc = {
+        clientName: user.name,
+        address: p.address,
+        monthly: p.finalMonthly,
+        startDate,
+        termMonths: 12,
+        services: [p.quote.core, ...p.quote.addons].map((l) => ({ label: l.label, cadence: l.cadence })),
+        tasks: planTasks(p.selections),
+        terms: (await store.get('config/agreement'))?.terms || DEFAULT_TERMS,
+      };
+      const text = agreementText(doc);
+      p.agreement = { ...doc, status: 'sent', sentAt: new Date().toISOString(), text, hash: crypto.createHash('sha256').update(text).digest('hex'), signature: null };
+      if (['estimate', 'lead', 'contacted'].includes(p.status)) p.status = 'walkthrough';
+      await saveProperty(p);
+      return json({ property: p }, 201);
+    }],
+
+    ['DELETE', '/api/admin/properties/:id/agreement', async (req, url, { id }) => {
+      await requireAdmin(req);
+      const p = (await getProperty(id)) || bad('Property not found.', 404);
+      if (p.agreement?.status === 'signed') bad('A signed agreement cannot be withdrawn. Keep it for your records.', 409);
+      p.agreement = null;
+      await saveProperty(p);
+      return json({ property: p });
+    }],
+
+    // Client signs. Only the account that owns the property can sign, and
+    // only the exact text they were shown (matched by fingerprint).
+    ['POST', '/api/properties/:id/agreement/sign', async (req, url, { id }) => {
+      rateLimit(req, 'sign', 10);
+      const s = await requireUser(req);
+      const b = await body(req);
+      const p = (await getProperty(id)) || bad('Property not found.', 404);
+      if (s.role === 'admin' || !p.userId || s.uid !== p.userId) bad('Only the client can sign this agreement.', 403);
+      const a = p.agreement;
+      if (!a) bad('There is no agreement to sign yet.', 404);
+      if (a.status === 'signed') bad('This agreement is already signed.', 409);
+      if (b.hash !== a.hash) bad('This agreement was updated. Please reload and read the current version.', 409);
+      const name = str(b.name, 80);
+      if (name.length < 3 || !/\s/.test(name)) bad('Type your full legal name to sign.');
+      if (b.consent !== true) bad('Tick the box to agree to sign electronically.');
+      const user = await store.get(`users/${s.uid}`);
+      a.signature = {
+        name,
+        at: new Date().toISOString(),
+        email: user?.email || '',
+        ip: req.headers.get('x-nf-client-connection-ip') || req.headers.get('x-forwarded-for')?.split(',')[0].trim() || '',
+        userAgent: str(req.headers.get('user-agent'), 300),
+      };
+      a.status = 'signed';
+      p.status = 'client';
+      await saveProperty(p);
+      return json({ property: publicProperty(p) });
     }],
 
     ['PUT', '/api/admin/pricing', async (req) => {

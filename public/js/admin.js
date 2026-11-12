@@ -3,6 +3,7 @@
 import { $, $$, api, authModal, esc, fmtDate, money, sqft, STATUS_LABEL, toast, todayIso } from './common.js';
 import { ADDONS, CORE, jobEconomics, planTasks } from './pricing.js';
 import { lightbox, visitHtml } from './visits.js';
+import { agreementText } from './agreement.js';
 
 const app = $('#app');
 const state = { tab: 'pipeline', filter: 'open', properties: [], pricing: null, detail: null, photos: [] };
@@ -12,6 +13,7 @@ async function load() {
   const [{ properties }, { pricing }] = await Promise.all([api('GET', '/api/admin/properties'), api('GET', '/api/config')]);
   state.properties = properties;
   state.pricing = pricing;
+  state.terms = (await api('GET', '/api/admin/agreement-terms')).terms;
 }
 
 const econOf = (p) => jobEconomics(state.pricing, p.measurements, p.selections, p.finalMonthly || p.quote.monthly);
@@ -67,7 +69,7 @@ function detailHtml() {
     <div class="dash-grid">
       <div class="stack">
         <div class="card">
-          <h2 style="font-size:1.3rem">Log a completed visit</h2>
+          <h2 style="font-size:1.7rem">Log a completed visit</h2>
           <p class="small muted">This becomes a report on the client's dashboard the moment you save it.</p>
           <form id="visit-form">
             <div class="row">
@@ -84,15 +86,15 @@ function detailHtml() {
             <button class="btn">Save visit report</button>
           </form>
         </div>
-        <div><h2 style="font-size:1.3rem">Visit reports (${visits.length})</h2>${visits.length ? visits.map((v) => visitHtml(v, p.id, { admin: true })).join('') : '<div class="empty">No visits logged yet.</div>'}</div>
+        <div><h2 style="font-size:1.7rem">Visit reports (${visits.length})</h2>${visits.length ? visits.map((v) => visitHtml(v, p.id, { admin: true })).join('') : '<div class="empty">No visits logged yet.</div>'}</div>
       </div>
       <div class="stack">
         <div class="card">
-          <h2 style="font-size:1.3rem">Contact</h2>
+          <h2 style="font-size:1.7rem">Contact</h2>
           ${c ? `<dl class="kv"><dt>Name</dt><dd>${esc(c.name)}</dd><dt>Phone</dt><dd>${c.phone ? `<a href="tel:${esc(c.phone)}">${esc(c.phone)}</a>` : '—'}</dd><dt>Email</dt><dd><a href="mailto:${esc(c.email)}">${esc(c.email)}</a></dd></dl>` : '<p class="muted small" style="margin:0">This visitor measured their yard but hasn\'t created an account yet. A door hanger or postcard to this address is your follow-up.</p>'}
         </div>
         <div class="card">
-          <h2 style="font-size:1.3rem">Status &amp; price</h2>
+          <h2 style="font-size:1.7rem">Status &amp; price</h2>
           <form id="status-form">
             <div class="field"><label for="s-status">Status</label><select id="s-status">${STATUSES.map((s) => `<option value="${s}" ${p.status === s ? 'selected' : ''}>${esc(STATUS_LABEL[s])}</option>`).join('')}</select></div>
             <div class="field"><label for="s-final">Confirmed monthly price <span class="muted" style="font-weight:400">(after walkthrough)</span></label><input id="s-final" type="number" min="0" inputmode="numeric" value="${p.finalMonthly ?? ''}" placeholder="Budgetary: ${money(p.quote.low)}–${money(p.quote.high)}"></div>
@@ -104,21 +106,25 @@ function detailHtml() {
             <button class="btn small">Save</button>
           </form>
         </div>
+        <div class="card">
+          <h2 style="font-size:1.7rem">Service agreement</h2>
+          ${agreementAdminHtml(p, c)}
+        </div>
         <div class="card" style="border-color:${e.onTarget ? 'var(--green-500)' : 'var(--red)'}">
-          <h2 style="font-size:1.3rem">Does this job pay?</h2>
+          <h2 style="font-size:1.7rem">Does this job pay?</h2>
           <p class="small muted">At ${p.finalMonthly ? 'your confirmed price' : 'the calculated price'} of <strong>${money(p.finalMonthly || p.quote.monthly)}/mo</strong>, with a crew doing the work. Estimated from the measurements — check it against real time on site.</p>
           <dl class="kv">
             <dt>Yearly revenue</dt><dd class="num">${money(e.revenue)}</dd>
             <dt>Crew time</dt><dd class="num">~${e.hoursPerYear} hrs/yr (${e.minutesPerVisit} min on site per mowing visit)</dd>
             <dt>Crew cost at ${money(state.pricing.labor.loadedCostPerHour)}/hr</dt><dd class="num">−${money(e.laborCost)}</dd>
-            <dt>Mulch</dt><dd class="num">−${money(e.materials)}</dd>
+            <dt>Materials (mulch, flowers)</dt><dd class="num">−${money(e.materials)}</dd>
             <dt>Left for overhead &amp; profit</dt><dd class="num">${money(e.grossProfit)} (${e.grossMarginPct}%)</dd>
             <dt>Revenue per crew hour</dt><dd class="num" style="color:${e.onTarget ? 'var(--green-700)' : 'var(--red)'}">${money(e.revenuePerHour)} <span class="muted" style="font-weight:400">(target ${money(state.pricing.labor.targetRevenuePerHour)})</span></dd>
           </dl>
           ${e.onTarget ? '' : '<p class="warn" style="margin:10px 0 0">Below your target. Raise the confirmed price, or check whether the shrub and bed numbers are overstated.</p>'}
         </div>
         <div class="card">
-          <h2 style="font-size:1.3rem">Plan &amp; measurements</h2>
+          <h2 style="font-size:1.7rem">Plan &amp; measurements</h2>
           <p class="small muted">Correct these after the walkthrough — the quote recalculates from your pricing.</p>
           <form id="plan-form">
             <div class="row">
@@ -133,16 +139,53 @@ function detailHtml() {
             <li><strong>Calculated</strong><strong class="num">${money(p.quote.monthly)}/mo · ${money(p.quote.annual)}/yr</strong></li>
             <li><span>Range shown to prospect</span><span class="num">${money(p.quote.low)}–${money(p.quote.high)}</span></li>
           </ul>
-          <dl class="kv" style="margin-top:10px"><dt>Lot</dt><dd class="num">${sqft(m.lotSqft)} sq ft (${(m.lotSqft / 43560).toFixed(2)} ac)</dd>${m.edited ? '<dt>Measurements</dt><dd>Edited by hand</dd>' : ''}</dl>
+          <dl class="kv" style="margin-top:10px"><dt>Lot</dt><dd class="num">${sqft(m.lotSqft)} sq ft (${(m.lotSqft / 43560).toFixed(2)} ac)</dd><dt>Lot outline</dt><dd>${p.lotSource === 'parcel' ? 'County parcel record' : 'Estimated'}</dd>${m.edited ? '<dt>Measurements</dt><dd>Edited by hand</dd>' : ''}</dl>
         </div>
         <div class="card">
-          <h2 style="font-size:1.3rem">Messages</h2>
+          <h2 style="font-size:1.7rem">Messages</h2>
           <div class="thread" id="thread">${(p.messages || []).length ? p.messages.map((x) => `<div class="msg ${x.from === 'team' ? 'mine' : ''}">${esc(x.text)}<time>${x.from === 'team' ? 'You' : 'Client'} · ${esc(fmtDate(x.at, { month: 'short', day: 'numeric' }))}</time></div>`).join('') : '<p class="small muted" style="margin:0">No messages yet.</p>'}</div>
           ${p.userId ? '<form id="msg-form"><label for="msg" class="small">Reply</label><textarea id="msg" rows="2" maxlength="1500" required></textarea><button class="btn small" style="margin-top:8px">Send</button></form>' : ''}
         </div>
         <p><button class="btn danger small" id="delete-property">Delete this property</button></p>
       </div>
     </div>`;
+}
+
+function agreementAdminHtml(p, contact) {
+  const a = p.agreement;
+  if (a?.status === 'signed') {
+    return `<p style="margin:0 0 8px"><span class="pill client">Signed</span></p>
+      <dl class="kv"><dt>Signed by</dt><dd>${esc(a.signature.name)}</dd><dt>When</dt><dd>${esc(new Date(a.signature.at).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' }))}</dd><dt>Account</dt><dd>${esc(a.signature.email)}</dd><dt>IP address</dt><dd>${esc(a.signature.ip || '—')}</dd><dt>Price</dt><dd class="num">${money(a.monthly)}/mo × ${a.termMonths}</dd><dt>Starts</dt><dd>${esc(fmtDate(a.startDate, { month: 'short', day: 'numeric', year: 'numeric' }))}</dd></dl>
+      <details style="margin-top:12px"><summary class="linkbtn">Read the signed text</summary><div class="agreement-text" style="margin-top:10px">${esc(a.text)}</div><p class="small muted">Fingerprint ${esc(a.hash)}</p></details>`;
+  }
+  if (a?.status === 'sent') {
+    return `<p style="margin:0 0 8px"><span class="pill lead">Waiting for signature</span></p>
+      <p class="small muted">Sent ${esc(fmtDate(a.sentAt, { month: 'short', day: 'numeric' }))} at ${money(a.monthly)}/mo, starting ${esc(fmtDate(a.startDate, { month: 'short', day: 'numeric', year: 'numeric' }))}. It is waiting on the client's dashboard. Signing makes them an active client automatically.</p>
+      <details><summary class="linkbtn">Read what was sent</summary><div class="agreement-text" style="margin-top:10px">${esc(a.text)}</div></details>
+      <p style="margin:14px 0 0"><button class="btn danger small" id="withdraw-agreement">Withdraw agreement</button></p>`;
+  }
+  if (!contact) return '<p class="small muted" style="margin:0">Once this visitor creates an account you can send them an agreement to sign.</p>';
+  if (!p.finalMonthly) return '<p class="small muted" style="margin:0">Save a confirmed monthly price above, then you can send the agreement for e-signature.</p>';
+  return `<p class="small muted">Sends a 12-month agreement at <strong>${money(p.finalMonthly)}/mo</strong> for the plan below to ${esc(contact.name)}'s dashboard to sign. Change the plan or price first if needed.</p>
+    <form id="agreement-form">
+      <div class="field"><label for="a-start">Service start date</label><input id="a-start" type="date" value="${todayIso()}" required></div>
+      <div class="error" role="alert"></div>
+      <button class="btn small">Send for signature</button>
+    </form>`;
+}
+
+function termsHtml() {
+  const sample = agreementText({ clientName: 'Pat Client', address: '123 Example Ln, Franklin, TN', monthly: 485, startDate: todayIso(), termMonths: 12, services: [{ label: CORE.label, cadence: CORE.cadence }], tasks: CORE.tasks, terms: state.terms });
+  return `
+    <p class="muted" style="max-width:70ch">This is section 4 of every agreement you send. The client's name, property, services, price and dates are filled in automatically. Changes apply to agreements sent from now on; signed agreements never change.</p>
+    <p class="warn" style="max-width:70ch">These default terms are a plain-English starting point, not legal advice. Have a Tennessee attorney read them before you rely on them, especially payment, cancellation and liability.</p>
+    <form id="terms-form" style="margin-top:18px">
+      <div class="field"><label for="terms">Terms</label><textarea id="terms" rows="16" maxlength="12000">${esc(state.terms)}</textarea></div>
+      <div class="error" role="alert"></div>
+      <button class="btn">Save terms</button> <button type="button" class="btn ghost" id="reset-terms">Reset to default</button>
+    </form>
+    <h2 style="font-size:1.7rem;margin-top:36px">What the client will read</h2>
+    <div class="agreement-text" style="max-height:none">${esc(sample)}</div>`;
 }
 
 const taskRow = (label, done) => `<div class="task-row"><input type="checkbox" ${done ? 'checked' : ''} aria-label="Done"><input type="text" class="lbl" value="${esc(label)}" maxlength="120" aria-label="Task"><input type="text" class="why" maxlength="200" placeholder="Note (optional)" aria-label="Note"></div>`;
@@ -202,8 +245,8 @@ function render() {
   if (state.detail) { app.innerHTML = detailHtml(); const t = $('#thread'); if (t) t.scrollTop = t.scrollHeight; return; }
   app.innerHTML = `
     <div class="dash-head"><h1>Owner admin</h1></div>
-    <div class="tabs" role="tablist"><button role="tab" class="${state.tab === 'pipeline' ? 'on' : ''}" data-tab="pipeline">Leads &amp; clients</button><button role="tab" class="${state.tab === 'pricing' ? 'on' : ''}" data-tab="pricing">Pricing</button></div>
-    ${state.tab === 'pipeline' ? pipelineHtml() : pricingHtml()}`;
+    <div class="tabs" role="tablist"><button role="tab" class="${state.tab === 'pipeline' ? 'on' : ''}" data-tab="pipeline">Leads &amp; clients</button><button role="tab" class="${state.tab === 'pricing' ? 'on' : ''}" data-tab="pricing">Pricing</button><button role="tab" class="${state.tab === 'terms' ? 'on' : ''}" data-tab="terms">Agreement</button></div>
+    ${state.tab === 'pipeline' ? pipelineHtml() : state.tab === 'terms' ? termsHtml() : pricingHtml()}`;
 }
 
 async function openDetail(id) {
@@ -234,6 +277,16 @@ app.addEventListener('click', async (e) => {
       await load();
       render();
       toast('Property deleted');
+    } else if (t.id === 'withdraw-agreement') {
+      if (!confirm('Withdraw this agreement? The client will no longer be able to sign it.')) return;
+      await api('DELETE', `/api/admin/properties/${state.detail.property.id}/agreement`);
+      await refreshDetail();
+      toast('Agreement withdrawn');
+    } else if (t.id === 'reset-terms') {
+      if (!confirm('Replace your terms with the built-in default?')) return;
+      state.terms = (await api('PUT', '/api/admin/agreement-terms', { reset: true })).terms;
+      render();
+      toast('Terms reset');
     } else if (t.id === 'reset-pricing') {
       if (!confirm('Reset every price to the built-in defaults?')) return;
       state.pricing = (await api('PUT', '/api/admin/pricing', { reset: true })).pricing;
@@ -290,6 +343,14 @@ app.addEventListener('submit', async (e) => {
     } else if (form.id === 'msg-form') {
       await api('POST', `/api/properties/${id}/messages`, { text: $('#msg').value });
       await refreshDetail();
+    } else if (form.id === 'agreement-form') {
+      await api('POST', `/api/admin/properties/${id}/agreement`, { startDate: $('#a-start').value });
+      await refreshDetail();
+      toast('Agreement sent to the client dashboard');
+    } else if (form.id === 'terms-form') {
+      state.terms = (await api('PUT', '/api/admin/agreement-terms', { terms: $('#terms').value })).terms;
+      render();
+      toast('Terms saved');
     } else if (form.id === 'pricing-form') {
       const pricing = structuredClone(state.pricing);
       $$('[data-p]', form).forEach((i) => {
@@ -316,7 +377,7 @@ $('#signout').addEventListener('click', async () => { await api('POST', '/api/au
 async function start() {
   const { user } = await api('GET', '/api/me');
   if (user?.role !== 'admin') {
-    app.innerHTML = `<div class="card auth-box" style="text-align:center"><h1 style="font-size:1.6rem">Owner sign-in</h1><p class="muted">${user ? 'You are signed in as a client. Sign out first, then sign in with the owner account.' : 'Sign in with the owner email and password.'}</p>${user ? '<a class="btn" href="/portal.html">Go to my dashboard</a>' : '<button class="btn block" id="do-login">Sign in</button>'}</div>`;
+    app.innerHTML = `<div class="card auth-box" style="text-align:center"><h1 style="font-size:2.2rem">Owner sign-in</h1><p class="muted">${user ? 'You are signed in as a client. Sign out first, then sign in with the owner account.' : 'Sign in with the owner email and password.'}</p>${user ? '<a class="btn" href="/portal.html">Go to my dashboard</a>' : '<button class="btn block" id="do-login">Sign in</button>'}</div>`;
     $('#do-login')?.addEventListener('click', async () => { if (await authModal('login')) start(); });
     return;
   }

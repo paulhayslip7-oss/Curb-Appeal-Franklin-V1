@@ -2,8 +2,9 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Curb Appeal Franklin — Year-round grounds care for one monthly price</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0e2216">
+  <title>Curb Appeal Franklin — Private, year-round grounds care</title>
   <meta name="description" content="Type your address and see a budgetary monthly price for all-inclusive, year-round grounds care in Franklin, TN — measured from aerial imagery in about a minute.">
   <link rel="stylesheet" href="/vendor/leaflet/leaflet.css">
   <link rel="stylesheet" href="/css/styles.css">
@@ -14,9 +15,9 @@
       <a class="logo" href="/"><span class="logo-mark" aria-hidden="true"></span>Curb Appeal Franklin</a>
       <nav>
         <a class="hide-sm" href="#why">Why year-round</a>
-        <a class="hide-sm" href="#how">How it works</a>
-        <a class="hide-sm" href="#dashboard">Your dashboard</a>
         <a class="hide-sm" href="#services">Services</a>
+        <a class="hide-sm" href="#about">About</a>
+        <a class="hide-sm" href="sms:+16159451614">Text (615) 945-1614</a>
         <a class="btn ghost small" id="account-link" href="/portal.html">Client sign in</a>
       </nav>
     </div>
@@ -26,28 +27,29 @@
     <div class="hero">
       <div class="container">
         <div>
-        <div class="eyebrow">All-inclusive grounds care · Franklin, Tennessee</div>
+        <div class="eyebrow">Private grounds care · Franklin, Tennessee</div>
         <h1>We stay on top of your yard, so it never <em>gets away</em> from you.</h1>
-        <p class="lead">Lawn, weeds, shrubs, leaves and mulch — handled at every visit, all year, for one fixed monthly price. Type your address and see yours in about a minute.</p>
+        <p class="lead">Lawn, beds, shrubs, leaves and mulch, kept up at every visit, all year, under one annual agreement. Enter your address to see what that costs for your home.</p>
         <form class="address-form" id="address-form">
           <input id="address" name="address" autocomplete="off" placeholder="Start typing your street address" aria-label="Your street address" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="address-suggestions" required>
           <ul class="suggest" id="address-suggestions" role="listbox" aria-label="Matching addresses" hidden></ul>
-          <button class="btn" type="submit">Measure my yard</button>
+          <button class="btn" type="submit">Measure my property</button>
         </form>
         <div class="error" id="address-error" role="alert"></div>
+        <p class="hero-text">Rather talk it through? <a href="sms:+16159451614">Text (615) 945-1614</a></p>
         <ul class="hero-points">
-          <li>Boots on the ground all twelve months</li>
-          <li>No surprise bills for big cleanups</li>
+          <li>On your property all twelve months</li>
+          <li>One fixed monthly price</li>
           <li>A private dashboard for your home</li>
         </ul>
         </div>
         <div class="plat" aria-hidden="true">
-          <svg viewBox="0 0 420 380" xmlns="http://www.w3.org/2000/svg" font-family="'Plex Mono', ui-monospace, monospace" font-size="9" fill="#16211a">
+          <svg viewBox="0 0 420 380" xmlns="http://www.w3.org/2000/svg" font-family="'Plex Mono', ui-monospace, monospace" font-size="9" fill="#141c17">
             <defs>
               <pattern id="turf" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(35)"><rect width="6" height="6" fill="#dfe8d8"/><line x1="0" y1="0" x2="0" y2="6" stroke="#9db894" stroke-width="1.4"/></pattern>
               <pattern id="pave" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#e8e1d0"/><path d="M0 8L8 0" stroke="#bdb39b" stroke-width=".8"/></pattern>
             </defs>
-            <rect x="1" y="1" width="418" height="378" fill="none" stroke="#16211a" stroke-width="1.5"/>
+            <rect x="1" y="1" width="418" height="378" fill="none" stroke="#141c17" stroke-width="1"/>
             <text x="14" y="22" letter-spacing="1">SHEET 01 — YOUR PROPERTY, MEASURED</text>
             <line x1="14" y1="30" x2="406" y2="30" stroke="#16211a" stroke-width=".8"/>
             <!-- street -->
@@ -67,14 +69,14 @@
               <circle cx="92" cy="84" r="9"/><circle cx="112" cy="80" r="7"/><circle cx="326" cy="80" r="9"/><circle cx="330" cy="104" r="7"/><circle cx="88" cy="150" r="7"/><circle cx="88" cy="170" r="7"/>
             </g>
             <!-- corner pins -->
-            <g fill="#f4f0e6" stroke="#b8502a" stroke-width="2.4"><rect x="65" y="57" width="10" height="10"/><rect x="345" y="49" width="10" height="10"/><rect x="351" y="291" width="10" height="10"/><rect x="59" y="291" width="10" height="10"/></g>
+            <g fill="#f4f0e6" stroke="#957538" stroke-width="2.4"><rect x="65" y="57" width="10" height="10"/><rect x="345" y="49" width="10" height="10"/><rect x="351" y="291" width="10" height="10"/><rect x="59" y="291" width="10" height="10"/></g>
             <!-- callouts -->
-            <g stroke="#b8502a" stroke-width="1" fill="none"><path d="M104 262H40V346"/><path d="M284 250H384V346"/><path d="M92 84H30"/></g>
-            <g fill="#b8502a"><circle cx="104" cy="262" r="2.5"/><circle cx="284" cy="250" r="2.5"/><circle cx="92" cy="84" r="2.5"/></g>
-            <text x="14" y="78" fill="#b8502a">SHRUBS</text><text x="14" y="90" font-weight="500" font-size="11">× 27</text>
-            <text x="14" y="358" fill="#b8502a">LAWN</text><text x="14" y="371" font-weight="500" font-size="11">9,510 SQ FT</text>
-            <text x="300" y="358" fill="#b8502a">HARD SURFACE</text><text x="300" y="371" font-weight="500" font-size="11">1,240 SQ FT</text>
-            <text x="160" y="358" fill="#b8502a">LOT</text><text x="160" y="371" font-weight="500" font-size="11">0.27 ACRE</text>
+            <g stroke="#957538" stroke-width="1" fill="none"><path d="M104 262H40V346"/><path d="M284 250H384V346"/><path d="M92 84H30"/></g>
+            <g fill="#7f6330"><circle cx="104" cy="262" r="2.5"/><circle cx="284" cy="250" r="2.5"/><circle cx="92" cy="84" r="2.5"/></g>
+            <text x="14" y="78" fill="#7f6330">SHRUBS</text><text x="14" y="90" font-weight="500" font-size="11">× 27</text>
+            <text x="14" y="358" fill="#7f6330">LAWN</text><text x="14" y="371" font-weight="500" font-size="11">9,510 SQ FT</text>
+            <text x="300" y="358" fill="#7f6330">HARD SURFACE</text><text x="300" y="371" font-weight="500" font-size="11">1,240 SQ FT</text>
+            <text x="160" y="358" fill="#7f6330">LOT</text><text x="160" y="371" font-weight="500" font-size="11">0.27 ACRE</text>
             <!-- north -->
             <g transform="translate(388 52)" stroke="#16211a" stroke-width="1.2" fill="none"><path d="M0 14V-8M-5 -2L0 -9L5 -2"/></g><text x="384" y="76">N</text>
           </svg>
@@ -116,7 +118,8 @@
             <h3 style="margin-top:22px"><span>Optional extras</span><span class="small muted" id="bundle-hint" style="font:400 .85rem var(--sans)"></span></h3>
             <div id="addons"></div>
             <div class="summary" id="summary"></div>
-            <p class="fine">This is a budgetary range from aerial measurements — not a final quote. Save it and we'll schedule a free walkthrough to confirm your fixed monthly price in person.</p>
+            <p class="fine">Questions about your estimate? <a href="sms:+16159451614">Text (615) 945-1614</a>.</p>
+            <p class="fine" style="margin-top:6px">This is a budgetary range from aerial measurements — not a final quote. Save it and we'll schedule a free walkthrough to confirm your fixed monthly price in person.</p>
           </div>
         </div>
       </div>
@@ -125,7 +128,7 @@
     <section id="why" class="section-alt">
       <div class="container">
         <div class="eyebrow">Why year-round</div>
-        <h2>Big cleanup jobs only exist because nobody was keeping up.</h2>
+        <h2>Big cleanup jobs only exist because no one was keeping up.</h2>
         <p class="muted" style="max-width:720px">A weekend of weed pulling. A truckload of leaves. Shrubs that need cutting back by half. Those jobs are what happens when a yard is left alone for months. We're at your home all year, so the small things get handled while they're still small.</p>
         <div class="versus">
           <div class="vs old">
@@ -155,10 +158,10 @@
     <section id="how">
       <div class="container">
         <div class="eyebrow">How it works</div>
-        <h2>From address to a number you can plan around</h2>
+        <h2>From your address to a price you can plan around</h2>
         <div class="steps">
           <div class="step"><h3>We map your property</h3><p class="muted">Enter your address and we pull an aerial view, outline your lot, and measure the lawn, plantings and hard surfaces.</p></div>
-          <div class="step"><h3>You build your plan</h3><p class="muted">Your plan already covers the lawn, weeds, shrubs, leaves and mulch. Add extras like pet waste removal or pressure washing if you want them — the monthly price updates as you go.</p></div>
+          <div class="step"><h3>You build your plan</h3><p class="muted">Your plan already covers the lawn, weeds, shrubs, leaves and mulch. Add extras such as seasonal flowers, window washing or pressure washing if you'd like them — the monthly price updates as you go.</p></div>
           <div class="step"><h3>We confirm in person</h3><p class="muted">Save your estimate and we'll walk the property with you, confirm the details, and lock in one fixed monthly price on an annual agreement.</p></div>
         </div>
       </div>
@@ -194,19 +197,35 @@
       </div>
     </section>
 
-    <section id="services" class="section-alt">
+    <section id="about" class="section-alt">
+      <div class="container about">
+        <div>
+          <div class="eyebrow">About</div>
+          <h2>Twenty-seven years in Franklin, and counting.</h2>
+        </div>
+        <div class="about-body">
+          <p class="about-lead">I grew up in Founders Pointe, back before Westhaven was even an idea.</p>
+          <p>I've watched this town grow up around me, one neighborhood at a time, and I've seen how much pride people here take in their homes. I've also seen how hard it is to find someone who will simply look after the outside of one properly, week in and week out, without being chased.</p>
+          <p>That is why Curb Appeal works the way it does. One agreement, one price, and a crew on your property all year, so the small things are handled before they become big ones. After every visit you can see exactly what was done, with photographs, on a dashboard that belongs to your home.</p>
+          <p>These are my neighbors' homes. I intend to treat them that way. If you ever have a question, you won't get a call center. You'll get me.</p>
+          <p class="about-sign">Owner, Curb Appeal Franklin &nbsp;·&nbsp; <a href="sms:+16159451614">Text (615) 945-1614</a></p>
+        </div>
+      </div>
+    </section>
+
+    <section id="services">
       <div class="container">
-        <div class="eyebrow">What's included, and what you can add</div>
-        <h2>One plan covers the grounds. Extras cover the rest.</h2>
+        <div class="eyebrow">The plan, and what you can add</div>
+        <h2>One plan keeps the grounds. The extras look after the rest.</h2>
         <div class="service-grid" id="service-grid"></div>
-        <p style="margin-top:32px"><a class="btn" href="#address">Get my monthly price</a></p>
+        <p style="margin-top:32px"><a class="btn" href="#address">See my monthly price</a></p>
       </div>
     </section>
   </main>
 
   <footer class="site-footer">
     <div class="container">
-      <strong style="color:#fff">Curb Appeal Franklin</strong> · Locally owned in Franklin, TN · <a href="tel:+16159451614">(615) 945-1614</a>
+      <strong style="color:#fff">Curb Appeal Franklin</strong> Locally owned in Franklin, Tennessee · <a href="sms:+16159451614">Text (615) 945-1614</a> · <a href="tel:+16159451614">Call</a>
       <p class="small" style="margin:10px 0 0">Online prices are budgetary ranges based on aerial measurements. Your fixed monthly price is confirmed after a free on-site walkthrough. Aerial imagery: TDOT Aerial Surveys / Esri. Building outlines: FEMA USA Structures.</p>
     </div>
   </footer>

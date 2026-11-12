@@ -6,15 +6,20 @@
 //      of the house the street is on.
 //   3. FEMA "USA Structures" building footprints (public ArcGIS layer) — the
 //      true outline of the house and its neighbours.
-// There is no free parcel-boundary source for Williamson County, so the lot
-// outline is an educated guess: it is squared up to the house, runs from the
-// street to a typical back-yard depth, and stops halfway to each neighbour.
-// The customer can drag it, and it is confirmed at the walkthrough.
+//   4. Recorded parcel lines — Williamson County's parcel map as published by
+//      the City of Franklin (covers the city, its growth boundary and
+//      Grassland). This is the real property line, so it is used whenever the
+//      address falls inside that coverage.
+// Outside that coverage the lot outline is an educated guess: squared up to
+// the house, from the street to a typical back-yard depth, stopping halfway
+// to each neighbour. Either way the customer can drag it, and it is confirmed
+// at the walkthrough.
 
 const TN_LOCATOR =
   'https://tnmap.tn.gov/arcgis/rest/services/LOCATORS/TN_ADDRESSPOINTS/GeocodeServer/findAddressCandidates';
 const STRUCTURES =
   'https://services2.arcgis.com/FiaPA4ga0iQKduv3/arcgis/rest/services/USA_Structures_View/FeatureServer/0/query';
+const PARCELS = 'https://publicmaps.franklintn.gov/arcgis/rest/services/Maps/Planning/MapServer/2/query';
 const CENSUS = 'https://geocoding.geo.census.gov/geocoder/locations/onelineaddress';
 
 async function getJson(url, ms = 7000) {
@@ -102,6 +107,55 @@ async function nearbyBuildings(lon, lat, radiusM = 85) {
     for (const ring of rings) if (ring?.length >= 4) out.push(ring.slice(0, -1)); // drop closing point
   }
   return out;
+}
+
+/** Thin a ring to at most `max` points, dropping the ones that matter least. */
+function simplifyRing(ring, max = 36) {
+  const pts = ring.slice();
+  const area = (a, b, c) => Math.abs((b[0] - a[0]) * (c[1] - a[1]) - (c[0] - a[0]) * (b[1] - a[1]));
+  while (pts.length > max) {
+    let drop = 0;
+    let least = Infinity;
+    for (let i = 0; i < pts.length; i++) {
+      const v = area(pts[(i - 1 + pts.length) % pts.length], pts[i], pts[(i + 1) % pts.length]);
+      if (v < least) { least = v; drop = i; }
+    }
+    pts.splice(drop, 1);
+  }
+  return pts;
+}
+
+/**
+ * The recorded parcel containing a point, or null.
+ * Only the outline is requested — never the owner or valuation fields.
+ */
+async function parcelAt(lon, lat) {
+  const url = `${PARCELS}?${new URLSearchParams({
+    geometry: `${lon},${lat}`,
+    geometryType: 'esriGeometryPoint',
+    inSR: '4326',
+    spatialRel: 'esriSpatialRelIntersects',
+    outFields: 'OBJECTID',
+    outSR: '4326',
+    geometryPrecision: '7',
+    f: 'geojson',
+  })}`;
+  const data = await getJson(url, 6000);
+  let best = null;
+  for (const f of data.features || []) {
+    const g = f.geometry;
+    const rings = g?.type === 'Polygon' ? [g.coordinates[0]] : g?.type === 'MultiPolygon' ? g.coordinates.map((p) => p[0]) : [];
+    for (const raw of rings) {
+      if (!raw || raw.length < 4) continue;
+      const ring = raw.slice(0, -1);
+      const P = projector(lat, lon);
+      const sqm = ringAreaM(ring.map(([x, y]) => P.toM(x, y)));
+      // Skip slivers and common-area / acreage tracts: 1,500 sq ft to 5 acres.
+      if (sqm < 140 || sqm > 20234) continue;
+      if (!best || sqm < best.sqm) best = { ring, sqm }; // the smallest parcel under the point is the house lot
+    }
+  }
+  return best ? simplifyRing(best.ring) : null;
 }
 
 function pointInRing(pt, ring) {
@@ -234,7 +288,8 @@ export function guessLot(roof, street, footprints = []) {
  * {
  *   label, lat, lon,
  *   precision: 'rooftop' | 'street',
- *   lot:       [[lon, lat], ...]   first-guess outline
+ *   lot:       [[lon, lat], ...]   property outline
+ *   lotSource: 'parcel' (recorded property line) | 'estimate' (our guess)
  *   buildings: [[[lon, lat], ...]] nearby building footprints
  * }
  */
@@ -246,15 +301,25 @@ export async function lookupAddress(input) {
   ]);
   const hit = tn || census;
   if (!hit) return null;
-  const buildings = await nearbyBuildings(hit.lon, hit.lat).catch(() => []);
+  const [buildings, parcelAtPoint] = await Promise.all([
+    nearbyBuildings(hit.lon, hit.lat).catch(() => []),
+    tn ? parcelAt(hit.lon, hit.lat).catch(() => null) : null,
+  ]);
   // A street-level match sits on the road, so it can't tell us which house.
-  const { lot } = guessLot(hit, tn ? census : null, tn ? buildings : []);
+  const guess = guessLot(hit, tn ? census : null, tn ? buildings : []);
+  let parcel = parcelAtPoint;
+  if (!parcel && tn && guess.house) {
+    // Address point fell in the road or a neighbour's sliver: try the middle of the house.
+    const c = centroid(guess.house);
+    parcel = await parcelAt(c[0], c[1]).catch(() => null);
+  }
   return {
     label: hit.label,
     lat: hit.lat,
     lon: hit.lon,
     precision: tn ? 'rooftop' : 'street',
-    lot,
+    lot: parcel || guess.lot,
+    lotSource: parcel ? 'parcel' : 'estimate',
     buildings,
   };
 }
